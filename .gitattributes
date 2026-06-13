@@ -1,0 +1,9 @@
+# Set the default behavior to handle all files as text and normalize line endings on checkin.
+* text=auto
+
+# Declare files that will always have CRLF line endings on checkout.
+*.bat text eol=crlf
+*.cmd text eol=crlf
+
+# Declare files that will always have LF line endings on checkout.
+*.sh text eol=lf
