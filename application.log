@@ -2647,3 +2647,7 @@ Identify and stop the process that's listening on port 8083 or configure this ap
 2026-06-13 18:45:07.058  INFO 16252 --- [main] o.s.s.c.ThreadPoolTaskScheduler          : Initializing ExecutorService 'taskScheduler'
 2026-06-13 18:45:07.202  INFO 16252 --- [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port(s): 8083 (http) with context path '/ihwt'
 2026-06-13 18:45:07.205  INFO 16252 --- [main] com.ihwthms.base.BaseApplication         : Started BaseApplication in 11.637 seconds (JVM running for 12.527)
+2026-06-13 18:45:49.108  INFO 16252 --- [http-nio-8083-exec-1] o.a.c.c.C.[Tomcat].[localhost].[/ihwt]   : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-06-13 18:45:49.108  INFO 16252 --- [http-nio-8083-exec-1] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+2026-06-13 18:45:49.182  INFO 16252 --- [http-nio-8083-exec-1] o.s.web.servlet.DispatcherServlet        : Completed initialization in 74 ms
+2026-06-13 18:45:49.463  WARN 16252 --- [http-nio-8083-exec-1] o.a.c.util.SessionIdGeneratorBase        : Creation of SecureRandom instance for session ID generation using [SHA1PRNG] took [128] milliseconds.
