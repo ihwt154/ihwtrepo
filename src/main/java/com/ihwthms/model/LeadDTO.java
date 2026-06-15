@@ -6,6 +6,7 @@ public class LeadDTO {
 
     private Long leadId;
     private String leadCode;
+    private String leadTitle;
     private String leadName;
     private String email;
     private String mobileNumber;
@@ -13,6 +14,7 @@ public class LeadDTO {
     private String country;
     private String leadStatus;
     private String leadSource;
+    private String eventName;
     private String priority;
     private Long assignedTo;
     private String assignedToName;
@@ -28,6 +30,7 @@ public class LeadDTO {
     public LeadDTO(Lead e) {
         this.leadId = e.getId();
         this.leadCode = e.getLeadCode();
+        this.leadTitle = e.getLeadTitle();
         this.leadName = e.getLeadName();
         this.email = e.getEmail();
         this.mobileNumber = e.getMobileNumber();
@@ -35,6 +38,7 @@ public class LeadDTO {
         this.country = e.getCountry();
         this.leadStatus = e.getLeadStatus();
         this.leadSource = e.getLeadSource();
+        this.eventName = e.getEventName();
         this.priority = e.getPriority();
         this.assignedTo = e.getAssignedTo();
         this.remarks = e.getRemarks();
@@ -72,6 +76,12 @@ public class LeadDTO {
 
     public String getLeadSource() { return leadSource; }
     public void setLeadSource(String leadSource) { this.leadSource = leadSource; }
+
+    public String getLeadTitle() { return leadTitle; }
+    public void setLeadTitle(String leadTitle) { this.leadTitle = leadTitle; }
+
+    public String getEventName() { return eventName; }
+    public void setEventName(String eventName) { this.eventName = eventName; }
 
     public String getPriority() { return priority; }
     public void setPriority(String priority) { this.priority = priority; }

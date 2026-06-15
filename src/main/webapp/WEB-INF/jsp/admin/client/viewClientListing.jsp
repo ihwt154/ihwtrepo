@@ -1,4 +1,4 @@
-﻿<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <!DOCTYPE html>
 <html lang="en">
@@ -54,7 +54,15 @@
         </form>
     </div>
 
-    <p style="font-size:0.85rem;color:#64748b;margin-bottom:12px;">Showing <strong>${CLIENT_LIST.size()}</strong> of <strong>${totalClients}</strong> clients</p>
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+        <p style="font-size:0.85rem;color:#64748b;margin:0;">Showing <strong>${CLIENT_LIST.size()}</strong> of <strong>${totalClients}</strong> clients</p>
+        <div style="display:flex; gap:8px;">
+            <a href="${pageContext.request.contextPath}/clients/export/excel?clientName=${f_clientName}&city=${f_city}&active=${f_active}"
+               style="padding:6px 12px;background:#10b981;color:#fff;border-radius:6px;text-decoration:none;font-size:0.8rem;font-weight:600;display:inline-flex;align-items:center;">Export Excel</a>
+            <a href="${pageContext.request.contextPath}/clients/export/pdf?clientName=${f_clientName}&city=${f_city}&active=${f_active}"
+               style="padding:6px 12px;background:#ef4444;color:#fff;border-radius:6px;text-decoration:none;font-size:0.8rem;font-weight:600;display:inline-flex;align-items:center;">Export PDF</a>
+        </div>
+    </div>
 
     <div style="background:rgba(255,255,255,0.85);border-radius:14px;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,0.06);">
         <table class="client-table">
@@ -65,7 +73,7 @@
             </thead>
             <tbody>
                 <c:if test="${empty CLIENT_LIST}">
-                    <tr><td colspan="8" style="text-align:center;padding:40px;color:#94a3b8;">No clients found. <a href="${pageContext.request.contextPath}/view_add_client_form">Add your first client â†’</a></td></tr>
+                    <tr><td colspan="8" style="text-align:center;padding:40px;color:#94a3b8;">No clients found. <a href="${pageContext.request.contextPath}/view_add_client_form">Add your first client</a></td></tr>
                 </c:if>
                 <c:forEach var="client" items="${CLIENT_LIST}" varStatus="st">
                     <tr>
@@ -83,11 +91,16 @@
                         </td>
                         <td>
                             <div style="display:flex;gap:6px;">
-                                <a href="${pageContext.request.contextPath}/view_client_details?clientId=${client.clientId}" title="View" style="padding:5px 10px;background:#f1f5f9;border-radius:6px;text-decoration:none;font-size:0.8rem;">ðŸ‘</a>
-                                <a href="${pageContext.request.contextPath}/view_edit_client_form?clientId=${client.clientId}" title="Edit" style="padding:5px 10px;background:#dbeafe;border-radius:6px;text-decoration:none;font-size:0.8rem;">âœï¸</a>
+                                <a href="${pageContext.request.contextPath}/view_client_details?clientId=${client.clientId}"
+                                   style="padding:5px 12px;background:#f1f5f9;color:#475569;border-radius:6px;text-decoration:none;font-size:0.78rem;font-weight:600;border:1px solid #e2e8f0;">View</a>
+                                <a href="${pageContext.request.contextPath}/view_edit_client_form?clientId=${client.clientId}"
+                                   style="padding:5px 12px;background:#dbeafe;color:#1d4ed8;border-radius:6px;text-decoration:none;font-size:0.78rem;font-weight:600;border:1px solid #bfdbfe;">Edit</a>
                                 <form method="post" action="${pageContext.request.contextPath}/toggle_client" style="display:inline;" onsubmit="return confirm('Toggle client status?');">
                                     <input type="hidden" name="clientId" value="${client.clientId}">
-                                    <button type="submit" style="padding:5px 10px;background:${client.active ? '#fee2e2' : '#d1fae5'};border:none;border-radius:6px;cursor:pointer;font-size:0.8rem;">${client.active ? 'ðŸ”´' : 'ðŸŸ¢'}</button>
+                                    <button type="submit"
+                                            style="padding:5px 12px;background:${client.active ? '#fee2e2' : '#d1fae5'};color:${client.active ? '#b91c1c' : '#065f46'};border:1px solid ${client.active ? '#fca5a5' : '#a7f3d0'};border-radius:6px;cursor:pointer;font-size:0.78rem;font-weight:600;">
+                                        ${client.active ? 'Deactivate' : 'Activate'}
+                                    </button>
                                 </form>
                             </div>
                         </td>
@@ -99,14 +112,14 @@
 
     <c:if test="${totalPages > 1}">
         <div style="display:flex;gap:8px;margin-top:20px;justify-content:center;">
-            <c:if test="${currentPage > 0}"><a href="?page=${currentPage-1}&pageSize=${pageSize}&clientName=${f_clientName}&city=${f_city}&active=${f_active}" style="padding:8px 14px;background:#f1f5f9;border-radius:8px;text-decoration:none;color:#475569;">â† Prev</a></c:if>
+            <c:if test="${currentPage > 0}"><a href="?page=${currentPage-1}&pageSize=${pageSize}&clientName=${f_clientName}&city=${f_city}&active=${f_active}" style="padding:8px 14px;background:#f1f5f9;border-radius:8px;text-decoration:none;color:#475569;">Prev</a></c:if>
             <c:forEach begin="0" end="${totalPages-1}" var="p">
                 <c:choose>
                     <c:when test="${p==currentPage}"><span style="padding:8px 14px;background:var(--accent-primary);color:#fff;border-radius:8px;">${p+1}</span></c:when>
                     <c:otherwise><a href="?page=${p}&pageSize=${pageSize}&clientName=${f_clientName}&city=${f_city}&active=${f_active}" style="padding:8px 14px;background:#f1f5f9;border-radius:8px;text-decoration:none;color:#475569;">${p+1}</a></c:otherwise>
                 </c:choose>
             </c:forEach>
-            <c:if test="${currentPage < totalPages-1}"><a href="?page=${currentPage+1}&pageSize=${pageSize}&clientName=${f_clientName}&city=${f_city}&active=${f_active}" style="padding:8px 14px;background:#f1f5f9;border-radius:8px;text-decoration:none;color:#475569;">Next â†’</a></c:if>
+            <c:if test="${currentPage < totalPages-1}"><a href="?page=${currentPage+1}&pageSize=${pageSize}&clientName=${f_clientName}&city=${f_city}&active=${f_active}" style="padding:8px 14px;background:#f1f5f9;border-radius:8px;text-decoration:none;color:#475569;">Next</a></c:if>
         </div>
     </c:if>
 </div>

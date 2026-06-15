@@ -5,6 +5,8 @@ import com.ihwthms.entity.User;
 import com.ihwthms.model.ClientDTO;
 import com.ihwthms.repository.UserRepository;
 import com.ihwthms.service.ClientService;
+import com.ihwthms.service.ClientSourceService;
+import com.ihwthms.service.ClientTypeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -17,15 +19,33 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import com.itextpdf.text.BaseColor;
+import com.itextpdf.text.Document;
+import com.itextpdf.text.DocumentException;
+import com.itextpdf.text.Element;
+import com.itextpdf.text.Font;
+import com.itextpdf.text.FontFactory;
+import com.itextpdf.text.PageSize;
+import com.itextpdf.text.Paragraph;
+import com.itextpdf.text.Phrase;
+import com.itextpdf.text.pdf.PdfPCell;
+import com.itextpdf.text.pdf.PdfPTable;
+import com.itextpdf.text.pdf.PdfWriter;
 
 @Controller
 public class ClientController {
 
     @Autowired private ClientService clientService;
     @Autowired private UserRepository userRepository;
+    @Autowired private ClientSourceService clientSourceService;
+    @Autowired private ClientTypeService clientTypeService;
 
     private static final List<String> CLIENT_STATUSES = Arrays.asList(
-            "Active", "Inactive", "Prospect", "Blacklisted");
+            "Active", "Inactive");
 
     private User getLoggedInUser() {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
@@ -38,6 +58,8 @@ public class ClientController {
         ModelAndView mv = new ModelAndView("admin/client/Admin_Add_Client");
         mv.addObject("CLIENT_OBJ", new ClientDTO());
         mv.addObject("CLIENT_STATUSES", CLIENT_STATUSES);
+        mv.addObject("CLIENT_SOURCES", clientSourceService.findAllActive());
+        mv.addObject("CLIENT_TYPES", clientTypeService.findAllActive());
         return mv;
     }
 
@@ -104,6 +126,8 @@ public class ClientController {
         ClientEntity entity = clientService.findById(clientId);
         mv.addObject("CLIENT_OBJ", new ClientDTO(entity));
         mv.addObject("CLIENT_STATUSES", CLIENT_STATUSES);
+        mv.addObject("CLIENT_SOURCES", clientSourceService.findAllActive());
+        mv.addObject("CLIENT_TYPES", clientTypeService.findAllActive());
         return mv;
     }
 
@@ -132,6 +156,125 @@ public class ClientController {
         return "redirect:view_clients_list";
     }
 
+    // ─── EXPORT EXCEL ────────────────────────────────────────────────────────
+    @GetMapping("clients/export/excel")
+    public void exportToExcel(
+            @RequestParam(required = false) String clientName,
+            @RequestParam(required = false) Boolean active,
+            @RequestParam(required = false) String city,
+            HttpServletResponse response) throws IOException {
+
+        List<ClientEntity> clients = clientService.filterClientsList(clientName, active, city);
+
+        Workbook workbook = new XSSFWorkbook();
+        Sheet sheet = workbook.createSheet("Clients");
+
+        // Header style
+        org.apache.poi.ss.usermodel.Font headerFont = workbook.createFont();
+        headerFont.setBold(true);
+        headerFont.setFontHeightInPoints((short) 12);
+        headerFont.setColor(IndexedColors.WHITE.getIndex());
+
+        CellStyle headerCellStyle = workbook.createCellStyle();
+        headerCellStyle.setFont(headerFont);
+        headerCellStyle.setFillForegroundColor(IndexedColors.DARK_BLUE.getIndex());
+        headerCellStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+        headerCellStyle.setAlignment(HorizontalAlignment.CENTER);
+
+        // Header Row
+        Row headerRow = sheet.createRow(0);
+        String[] columns = {"ID", "Client Name", "Mobile", "Email", "City", "Country", "Source", "Type", "Status"};
+        for (int i = 0; i < columns.length; i++) {
+            Cell cell = headerRow.createCell(i);
+            cell.setCellValue(columns[i]);
+            cell.setCellStyle(headerCellStyle);
+        }
+
+        // Data Rows
+        int rowNum = 1;
+        for (ClientEntity client : clients) {
+            Row row = sheet.createRow(rowNum++);
+            row.createCell(0).setCellValue(client.getClientId() != null ? client.getClientId() : 0);
+            row.createCell(1).setCellValue(client.getClientName() != null ? client.getClientName() : "");
+            row.createCell(2).setCellValue(client.getMobile() != null ? client.getMobile() : "");
+            row.createCell(3).setCellValue(client.getEmailId() != null ? client.getEmailId() : "");
+            row.createCell(4).setCellValue(client.getCity() != null ? client.getCity() : "");
+            row.createCell(5).setCellValue(client.getCountry() != null ? client.getCountry() : "");
+            row.createCell(6).setCellValue(client.getClientSource() != null ? client.getClientSource() : "");
+            row.createCell(7).setCellValue(client.getClientType() != null ? client.getClientType() : "");
+            row.createCell(8).setCellValue(Boolean.TRUE.equals(client.getActive()) ? "Active" : "Inactive");
+        }
+
+        // Auto-size columns
+        for (int i = 0; i < columns.length; i++) {
+            sheet.autoSizeColumn(i);
+        }
+
+        response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+        response.setHeader("Content-Disposition", "attachment; filename=clients.xlsx");
+        workbook.write(response.getOutputStream());
+        workbook.close();
+    }
+
+    // ─── EXPORT PDF ──────────────────────────────────────────────────────────
+    @GetMapping("clients/export/pdf")
+    public void exportToPdf(
+            @RequestParam(required = false) String clientName,
+            @RequestParam(required = false) Boolean active,
+            @RequestParam(required = false) String city,
+            HttpServletResponse response) throws IOException, DocumentException {
+
+        List<ClientEntity> clients = clientService.filterClientsList(clientName, active, city);
+
+        Document document = new Document(PageSize.A4.rotate());
+        response.setContentType("application/pdf");
+        response.setHeader("Content-Disposition", "attachment; filename=clients.pdf");
+
+        PdfWriter.getInstance(document, response.getOutputStream());
+        document.open();
+
+        // Title
+        com.itextpdf.text.Font titleFont = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 18, BaseColor.BLACK);
+        Paragraph title = new Paragraph("Client Directory", titleFont);
+        title.setAlignment(Element.ALIGN_CENTER);
+        title.setSpacingAfter(20);
+        document.add(title);
+
+        // Table
+        PdfPTable table = new PdfPTable(9);
+        table.setWidthPercentage(100);
+        table.setSpacingBefore(10f);
+        table.setSpacingAfter(10f);
+
+        // Header style
+        com.itextpdf.text.Font headerPdfFont = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 10, BaseColor.WHITE);
+        String[] headers = {"ID", "Client Name", "Mobile", "Email", "City", "Country", "Source", "Type", "Status"};
+        for (String h : headers) {
+            PdfPCell headerCell = new PdfPCell(new Phrase(h, headerPdfFont));
+            headerCell.setBackgroundColor(new BaseColor(15, 23, 42));
+            headerCell.setPadding(8);
+            headerCell.setHorizontalAlignment(Element.ALIGN_CENTER);
+            table.addCell(headerCell);
+        }
+
+        // Data rows style
+        com.itextpdf.text.Font dataFont = FontFactory.getFont(FontFactory.HELVETICA, 9, BaseColor.BLACK);
+        for (ClientEntity client : clients) {
+            table.addCell(new PdfPCell(new Phrase(String.valueOf(client.getClientId() != null ? client.getClientId() : 0), dataFont)));
+            table.addCell(new PdfPCell(new Phrase(client.getClientName() != null ? client.getClientName() : "", dataFont)));
+            table.addCell(new PdfPCell(new Phrase(client.getMobile() != null ? client.getMobile() : "", dataFont)));
+            table.addCell(new PdfPCell(new Phrase(client.getEmailId() != null ? client.getEmailId() : "", dataFont)));
+            table.addCell(new PdfPCell(new Phrase(client.getCity() != null ? client.getCity() : "", dataFont)));
+            table.addCell(new PdfPCell(new Phrase(client.getCountry() != null ? client.getCountry() : "", dataFont)));
+            table.addCell(new PdfPCell(new Phrase(client.getClientSource() != null ? client.getClientSource() : "", dataFont)));
+            table.addCell(new PdfPCell(new Phrase(client.getClientType() != null ? client.getClientType() : "", dataFont)));
+            table.addCell(new PdfPCell(new Phrase(Boolean.TRUE.equals(client.getActive()) ? "Active" : "Inactive", dataFont)));
+        }
+
+        document.add(table);
+        document.close();
+    }
+
     // ─── Helper ──────────────────────────────────────────────────────────────
     private ClientEntity buildEntityFromDTO(ClientDTO dto, ClientEntity existing, User loggedIn) {
         ClientEntity entity = existing != null ? existing : new ClientEntity();
@@ -141,6 +284,15 @@ public class ClientController {
         entity.setCity(dto.getCity());
         entity.setCountry(dto.getCountry());
         entity.setClientStatus(dto.getClientStatus() != null ? dto.getClientStatus() : "Active");
+        entity.setClientSource(dto.getClientSource());
+        entity.setClientType(dto.getClientType());
+        entity.setOrganizationName(dto.getOrganizationName());
+        entity.setOrganizationType(dto.getOrganizationType());
+        entity.setRegistrationNumber(dto.getRegistrationNumber());
+        entity.setWebsite(dto.getWebsite());
+        entity.setAddress(dto.getAddress());
+        entity.setPostalCode(dto.getPostalCode());
+        entity.setDesignation(dto.getDesignation());
         entity.setRemarks(dto.getRemarks());
         entity.setActive(dto.getActive() != null ? dto.getActive() : Boolean.TRUE);
         if (loggedIn != null) {

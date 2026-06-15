@@ -18,11 +18,31 @@
     </c:if>
     
     <a href="${pageContext.request.contextPath}/dashboard" class="gs-header-brand">
-        <img id="topLogo" src="${pageContext.request.contextPath}/resources/images/logo.png" alt="Logo">
+        <c:if test="${not empty centralConfig.logoPath}">
+            <c:set var="logoUrl" value="${fn:startsWith(centralConfig.logoPath, 'http') ? centralConfig.logoPath : pageContext.request.contextPath.concat(centralConfig.logoPath)}" />
+            <img id="topLogo" src="${logoUrl}" alt="Logo">
+        </c:if>
         <div class="gs-header-title">
-            International Chamber of Healthcare & Medical Tourism
+            <c:choose>
+                <c:when test="${not empty centralConfig.companyName}">
+                    ${centralConfig.companyName}
+                </c:when>
+                <c:otherwise>
+                    International Chamber of Healthcare & Medical Tourism
+                </c:otherwise>
+            </c:choose>
         </div>
     </a>
+
+    <script>
+        function updateLogo() {
+            const logo = document.getElementById('topLogo');
+            if (logo) {
+                const src = logo.src.split('?')[0];
+                logo.src = src + '?ts=' + new Date().getTime();
+            }
+        }
+    </script>
 
     <div class="gs-header-user" style="margin-left: auto;">
         <span>Welcome, <strong>
@@ -67,6 +87,8 @@
                 <ul class="gs-dropdown">
                     <li><a href="${pageContext.request.contextPath}/view_add_client_form" class="gs-dropdown-item">Add Client</a></li>
                     <li><a href="${pageContext.request.contextPath}/view_clients_list" class="gs-dropdown-item">Manage Clients</a></li>
+                    <li><a href="${pageContext.request.contextPath}/admin/client/sources" class="gs-dropdown-item">Client Source</a></li>
+                    <li><a href="${pageContext.request.contextPath}/admin/client/types" class="gs-dropdown-item">Client Type</a></li>
                 </ul>
             </li>
         </sec:authorize>

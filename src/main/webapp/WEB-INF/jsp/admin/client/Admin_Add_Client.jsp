@@ -1,4 +1,4 @@
-﻿<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <!DOCTYPE html>
 <html lang="en">
@@ -14,7 +14,7 @@
 <div class="page-container" style="padding:30px; max-width:800px; margin:0 auto;">
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:24px;">
         <h2 style="font-size:1.5rem; font-weight:700; color:var(--text-primary);">Add New Client</h2>
-        <a href="${pageContext.request.contextPath}/view_clients_list" style="padding:9px 18px;background:#f1f5f9;color:#475569;border-radius:8px;text-decoration:none;">â† Back to Clients</a>
+        <a href="${pageContext.request.contextPath}/view_clients_list" style="padding:9px 18px;background:#f1f5f9;color:#475569;border-radius:8px;text-decoration:none;">Back to Clients</a>
     </div>
 
     <c:if test="${not empty error}"><div style="background:#fee2e2;color:#991b1b;padding:12px;border-radius:8px;margin-bottom:16px;">${error}</div></c:if>
@@ -44,12 +44,61 @@
                     </select>
                 </div>
                 <div>
+                    <label style="display:block;margin-bottom:4px;font-size:0.85rem;font-weight:600;color:#64748b;">Client Source</label>
+                    <select name="clientSource" style="width:100%;padding:10px;border:1px solid #e2e8f0;border-radius:8px;">
+                        <option value="">-- Select Source --</option>
+                        <c:forEach var="src" items="${CLIENT_SOURCES}">
+                            <option value="${src.sourceName}">${src.sourceName}</option>
+                        </c:forEach>
+                    </select>
+                </div>
+                <div>
+                    <label style="display:block;margin-bottom:4px;font-size:0.85rem;font-weight:600;color:#64748b;">Client Type</label>
+                    <select name="clientType" style="width:100%;padding:10px;border:1px solid #e2e8f0;border-radius:8px;">
+                        <option value="">-- Select Type --</option>
+                        <c:forEach var="tp" items="${CLIENT_TYPES}">
+                            <option value="${tp.typeName}">${tp.typeName}</option>
+                        </c:forEach>
+                    </select>
+                </div>
+                <div>
                     <label style="display:block;margin-bottom:4px;font-size:0.85rem;font-weight:600;color:#64748b;">City</label>
                     <input type="text" name="city" style="width:100%;padding:10px;border:1px solid #e2e8f0;border-radius:8px;">
                 </div>
                 <div>
                     <label style="display:block;margin-bottom:4px;font-size:0.85rem;font-weight:600;color:#64748b;">Country</label>
                     <input type="text" name="country" style="width:100%;padding:10px;border:1px solid #e2e8f0;border-radius:8px;">
+                </div>
+            </div>
+            <div style="font-weight:600;color:var(--accent-primary);margin-top:24px;margin-bottom:16px;border-bottom:2px solid var(--accent-primary);padding-bottom:8px;">Organization & Additional Details</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px;">
+                <div>
+                    <label style="display:block;margin-bottom:4px;font-size:0.85rem;font-weight:600;color:#64748b;">Organization Name</label>
+                    <input type="text" name="organizationName" style="width:100%;padding:10px;border:1px solid #e2e8f0;border-radius:8px;">
+                </div>
+                <div>
+                    <label style="display:block;margin-bottom:4px;font-size:0.85rem;font-weight:600;color:#64748b;">Organization Type</label>
+                    <input type="text" name="organizationType" style="width:100%;padding:10px;border:1px solid #e2e8f0;border-radius:8px;">
+                </div>
+                <div>
+                    <label style="display:block;margin-bottom:4px;font-size:0.85rem;font-weight:600;color:#64748b;">Registration Number</label>
+                    <input type="text" name="registrationNumber" style="width:100%;padding:10px;border:1px solid #e2e8f0;border-radius:8px;">
+                </div>
+                <div>
+                    <label style="display:block;margin-bottom:4px;font-size:0.85rem;font-weight:600;color:#64748b;">Designation</label>
+                    <input type="text" name="designation" style="width:100%;padding:10px;border:1px solid #e2e8f0;border-radius:8px;">
+                </div>
+                <div>
+                    <label style="display:block;margin-bottom:4px;font-size:0.85rem;font-weight:600;color:#64748b;">Website</label>
+                    <input type="text" name="website" style="width:100%;padding:10px;border:1px solid #e2e8f0;border-radius:8px;">
+                </div>
+                <div>
+                    <label style="display:block;margin-bottom:4px;font-size:0.85rem;font-weight:600;color:#64748b;">Postal Code</label>
+                    <input type="text" name="postalCode" style="width:100%;padding:10px;border:1px solid #e2e8f0;border-radius:8px;">
+                </div>
+                <div style="grid-column: span 2;">
+                    <label style="display:block;margin-bottom:4px;font-size:0.85rem;font-weight:600;color:#64748b;">Address</label>
+                    <textarea name="address" rows="2" style="width:100%;padding:10px;border:1px solid #e2e8f0;border-radius:8px;resize:vertical;"></textarea>
                 </div>
             </div>
             <div style="margin-bottom:24px;">
@@ -65,4 +114,3 @@
 </div>
 </body>
 </html>
-

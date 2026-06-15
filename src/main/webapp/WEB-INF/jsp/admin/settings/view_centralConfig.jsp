@@ -195,6 +195,11 @@
 
     <c:if test="${not empty success}">
         <div class="alert-success">✅ ${success}</div>
+        <script>
+            if (window.parent && typeof window.parent.updateLogo === 'function') {
+                window.parent.updateLogo();
+            }
+        </script>
     </c:if>
     <c:if test="${not empty error}">
         <div class="alert-error">❌ ${error}</div>
@@ -253,11 +258,9 @@
                 <div class="form-group">
                     <label>Logo Upload (replaces current logo)</label>
                     <input type="file" id="logoFile" name="logoFile" accept="image/*" style="border:none;padding:4px 0;background:transparent;" />
-                    <img id="logoPreview" class="logo-preview" alt="Logo Preview" />
-                </div>
-                <div class="form-group">
-                    <label>Current Logo Path</label>
-                    <form:input path="logoPath" />
+                    <img id="logoPreview" class="logo-preview" alt="Logo Preview" 
+                         src="${not empty CENTRAL_CONFIG_OBJ.logoPath ? pageContext.request.contextPath.concat(CENTRAL_CONFIG_OBJ.logoPath) : ''}" 
+                         style="${not empty CENTRAL_CONFIG_OBJ.logoPath ? 'display:block;' : 'display:none;'}" />
                 </div>
             </div>
         </div>
@@ -414,32 +417,6 @@
             </div>
         </div>
 
-        <%-- ===== QUOTATION CONFIG ===== --%>
-        <div class="settings-section">
-            <div class="section-title">📄 Quotation Configuration</div>
-            <div class="form-grid-2">
-                <div class="form-group form-group-full">
-                    <label>Quotation Top Cover Text</label>
-                    <form:textarea path="quotationTopCover" rows="5" />
-                </div>
-                <div class="form-group">
-                    <label>Inclusions</label>
-                    <form:textarea path="inclusions" rows="6" />
-                </div>
-                <div class="form-group">
-                    <label>Terms &amp; Conditions</label>
-                    <form:textarea path="tnc" rows="6" />
-                </div>
-                <div class="form-group">
-                    <label>USP (Unique Selling Points)</label>
-                    <form:textarea path="usp" rows="6" />
-                </div>
-                <div class="form-group">
-                    <label>Company Info</label>
-                    <form:textarea path="companyInfo" rows="6" />
-                </div>
-            </div>
-        </div>
 
         <%-- ===== SAVE BUTTON ===== --%>
         <div class="save-bar">

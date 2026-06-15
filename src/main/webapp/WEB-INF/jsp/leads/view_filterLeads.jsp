@@ -1,4 +1,4 @@
-﻿<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <!DOCTYPE html>
 <html lang="en">
@@ -51,20 +51,20 @@
                 <label style="font-size:0.8rem;font-weight:600;color:#64748b;display:block;margin-bottom:4px;">Status</label>
                 <select name="leadStatus" style="width:100%;padding:8px;border:1px solid #e2e8f0;border-radius:8px;">
                     <option value="">All Statuses</option>
-                    <c:forEach var="s" items="${LEAD_STATUSES}">
-                        <option value="${s}" ${f_leadStatus == s ? 'selected' : ''}>${s}</option>
-                    </c:forEach>
+                    <option value="Open" ${f_leadStatus == 'Open' ? 'selected' : ''}>Open</option>
+                    <option value="Closed" ${f_leadStatus == 'Closed' ? 'selected' : ''}>Closed</option>
                 </select>
             </div>
             <div>
                 <label style="font-size:0.8rem;font-weight:600;color:#64748b;display:block;margin-bottom:4px;">Source</label>
                 <select name="leadSource" style="width:100%;padding:8px;border:1px solid #e2e8f0;border-radius:8px;">
                     <option value="">All Sources</option>
-                    <c:forEach var="src" items="${LEAD_SOURCES}">
-                        <option value="${src}" ${f_leadSource == src ? 'selected' : ''}>${src}</option>
+                    <c:forEach var="src" items="${CLIENT_SOURCES}">
+                        <option value="${src.sourceName}" ${f_leadSource == src.sourceName ? 'selected' : ''}>${src.sourceName}</option>
                     </c:forEach>
                 </select>
             </div>
+
             <div>
                 <label style="font-size:0.8rem;font-weight:600;color:#64748b;display:block;margin-bottom:4px;">Priority</label>
                 <select name="priority" style="width:100%;padding:8px;border:1px solid #e2e8f0;border-radius:8px;">
@@ -91,7 +91,15 @@
     </div>
 
     <%-- Results Summary --%>
-    <p style="font-size:0.85rem;color:#64748b;margin-bottom:12px;">Showing <strong>${LEADS_LIST.size()}</strong> of <strong>${totalLeads}</strong> leads</p>
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+        <p style="font-size:0.85rem;color:#64748b;margin:0;">Showing <strong>${LEADS_LIST.size()}</strong> of <strong>${totalLeads}</strong> leads</p>
+        <div style="display:flex; gap:8px;">
+            <a href="${pageContext.request.contextPath}/leads/export/excel?leadStatus=${f_leadStatus}&leadSource=${f_leadSource}&clientName=${f_clientName}&assignedTo=${f_assignedTo}&priority=${f_priority}"
+               style="padding:6px 12px;background:#10b981;color:#fff;border-radius:6px;text-decoration:none;font-size:0.8rem;font-weight:600;display:inline-flex;align-items:center;">Export Excel</a>
+            <a href="${pageContext.request.contextPath}/leads/export/pdf?leadStatus=${f_leadStatus}&leadSource=${f_leadSource}&clientName=${f_clientName}&assignedTo=${f_assignedTo}&priority=${f_priority}"
+               style="padding:6px 12px;background:#ef4444;color:#fff;border-radius:6px;text-decoration:none;font-size:0.8rem;font-weight:600;display:inline-flex;align-items:center;">Export PDF</a>
+        </div>
+    </div>
 
     <%-- Table --%>
     <div style="background:rgba(255,255,255,0.85);border-radius:14px;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,0.06);">
@@ -116,17 +124,29 @@
                 <c:forEach var="lead" items="${LEADS_LIST}" varStatus="st">
                     <tr>
                         <td style="color:#94a3b8;font-size:0.8rem;">${st.index + 1}</td>
-                        <td><strong>${lead.leadName}</strong></td>
-                        <td>${lead.clientName}</td>
+                        <td>
+                            <div style="font-weight:600; color:#1e293b;">${lead.leadName}</div>
+                            <c:if test="${not empty lead.leadTitle}">
+                                <div style="font-size:0.78rem; color:#64748b; margin-top:2px;">${lead.leadTitle}</div>
+                            </c:if>
+                        </td>
+                        <td>
+                            <div>${lead.clientName}</div>
+                            <c:if test="${not empty lead.leadSource}">
+                                <div style="font-size:0.75rem; color:#8c7ae6; margin-top:2px;">Source: ${lead.leadSource}</div>
+                            </c:if>
+                            <c:if test="${not empty lead.eventName}">
+                                <div style="font-size:0.75rem; color:#0d9488; margin-top:2px;">Event: ${lead.eventName}</div>
+                            </c:if>
+                        </td>
                         <td>${lead.mobileNumber}</td>
                         <td>${lead.city}</td>
                         <td>
                             <c:choose>
-                                <c:when test="${lead.leadStatus == 'NEW'}"><span class="badge badge-new">${lead.leadStatus}</span></c:when>
-                                <c:when test="${lead.leadStatus == 'CONTACTED'}"><span class="badge badge-contacted">${lead.leadStatus}</span></c:when>
-                                <c:when test="${lead.leadStatus == 'QUALIFIED'}"><span class="badge badge-qualified">${lead.leadStatus}</span></c:when>
-                                <c:when test="${lead.leadStatus == 'LOST'}"><span class="badge badge-lost">${lead.leadStatus}</span></c:when>
-                                <c:when test="${lead.leadStatus == 'WON'}"><span class="badge badge-won">${lead.leadStatus}</span></c:when>
+                                <c:when test="${lead.leadStatus == 'Open'}"><span class="badge badge-new">${lead.leadStatus}</span></c:when>
+                                <c:when test="${lead.leadStatus == 'Work In Progress'}"><span class="badge badge-contacted">${lead.leadStatus}</span></c:when>
+                                <c:when test="${lead.leadStatus == 'Won-Converted'}"><span class="badge badge-won">${lead.leadStatus}</span></c:when>
+                                <c:when test="${lead.leadStatus == 'Failed-Closed'}"><span class="badge badge-lost">${lead.leadStatus}</span></c:when>
                                 <c:otherwise><span class="badge badge-default">${lead.leadStatus}</span></c:otherwise>
                             </c:choose>
                         </td>
@@ -134,9 +154,10 @@
                         <td>${lead.assignedToName}</td>
                         <td>
                             <div style="display:flex;gap:6px;">
-                                <a href="${pageContext.request.contextPath}/view_lead_details?leadId=${lead.leadId}" title="View" style="padding:5px 10px;background:#f1f5f9;border-radius:6px;text-decoration:none;font-size:0.8rem;">ðŸ‘</a>
-                                <a href="${pageContext.request.contextPath}/view_edit_lead_form?leadId=${lead.leadId}" title="Edit" style="padding:5px 10px;background:#dbeafe;border-radius:6px;text-decoration:none;font-size:0.8rem;">âœï¸</a>
-                                <a href="${pageContext.request.contextPath}/view_lead_followup_details?leadId=${lead.leadId}" title="Followups" style="padding:5px 10px;background:#d1fae5;border-radius:6px;text-decoration:none;font-size:0.8rem;">ðŸ“‹</a>
+                                <a href="${pageContext.request.contextPath}/view_lead_details?leadId=${lead.leadId}"
+                                   style="padding:5px 12px;background:#f1f5f9;color:#475569;border-radius:6px;text-decoration:none;font-size:0.78rem;font-weight:600;border:1px solid #e2e8f0;">View</a>
+                                <a href="${pageContext.request.contextPath}/view_edit_lead_form?leadId=${lead.leadId}"
+                                   style="padding:5px 12px;background:#dbeafe;color:#1d4ed8;border-radius:6px;text-decoration:none;font-size:0.78rem;font-weight:600;border:1px solid #bfdbfe;">Edit</a>
                             </div>
                         </td>
                     </tr>
@@ -149,20 +170,19 @@
     <c:if test="${totalPages > 1}">
         <div class="pagination">
             <c:if test="${currentPage > 0}">
-                <a href="?page=${currentPage - 1}&pageSize=${pageSize}&leadStatus=${f_leadStatus}&leadSource=${f_leadSource}&clientName=${f_clientName}&priority=${f_priority}">â† Prev</a>
+                <a href="?page=${currentPage - 1}&pageSize=${pageSize}&leadStatus=${f_leadStatus}&leadSource=${f_leadSource}&clientName=${f_clientName}&priority=${f_priority}&assignedTo=${f_assignedTo}">← Prev</a>
             </c:if>
             <c:forEach begin="0" end="${totalPages - 1}" var="p">
                 <c:choose>
                     <c:when test="${p == currentPage}"><span class="active">${p + 1}</span></c:when>
-                    <c:otherwise><a href="?page=${p}&pageSize=${pageSize}&leadStatus=${f_leadStatus}&leadSource=${f_leadSource}&clientName=${f_clientName}&priority=${f_priority}">${p + 1}</a></c:otherwise>
+                    <c:otherwise><a href="?page=${p}&pageSize=${pageSize}&leadStatus=${f_leadStatus}&leadSource=${f_leadSource}&clientName=${f_clientName}&priority=${f_priority}&assignedTo=${f_assignedTo}">${p + 1}</a></c:otherwise>
                 </c:choose>
             </c:forEach>
             <c:if test="${currentPage < totalPages - 1}">
-                <a href="?page=${currentPage + 1}&pageSize=${pageSize}&leadStatus=${f_leadStatus}&leadSource=${f_leadSource}&clientName=${f_clientName}&priority=${f_priority}">Next â†’</a>
+                <a href="?page=${currentPage + 1}&pageSize=${pageSize}&leadStatus=${f_leadStatus}&leadSource=${f_leadSource}&clientName=${f_clientName}&priority=${f_priority}&assignedTo=${f_assignedTo}">Next →</a>
             </c:if>
         </div>
     </c:if>
 </div>
 </body>
 </html>
-

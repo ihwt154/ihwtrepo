@@ -13,6 +13,15 @@ public class ClientDTO {
     private String country;
     private String clientStatus;
     private Long assignedTo;
+    private String clientSource;
+    private String clientType;
+    private String organizationName;
+    private String organizationType;
+    private String registrationNumber;
+    private String website;
+    private String address;
+    private String postalCode;
+    private String designation;
     private String remarks;
     private Boolean active;
 
@@ -28,6 +37,15 @@ public class ClientDTO {
         this.country = e.getCountry();
         this.clientStatus = e.getClientStatus();
         this.assignedTo = e.getAssignedTo();
+        this.clientSource = e.getClientSource();
+        this.clientType = e.getClientType();
+        this.organizationName = e.getOrganizationName();
+        this.organizationType = e.getOrganizationType();
+        this.registrationNumber = e.getRegistrationNumber();
+        this.website = e.getWebsite();
+        this.address = e.getAddress();
+        this.postalCode = e.getPostalCode();
+        this.designation = e.getDesignation();
         this.remarks = e.getRemarks();
         this.active = e.getActive();
     }
@@ -59,6 +77,33 @@ public class ClientDTO {
 
     public Long getAssignedTo() { return assignedTo; }
     public void setAssignedTo(Long assignedTo) { this.assignedTo = assignedTo; }
+
+    public String getClientSource() { return clientSource; }
+    public void setClientSource(String clientSource) { this.clientSource = clientSource; }
+
+    public String getClientType() { return clientType; }
+    public void setClientType(String clientType) { this.clientType = clientType; }
+
+    public String getOrganizationName() { return organizationName; }
+    public void setOrganizationName(String organizationName) { this.organizationName = organizationName; }
+
+    public String getOrganizationType() { return organizationType; }
+    public void setOrganizationType(String organizationType) { this.organizationType = organizationType; }
+
+    public String getRegistrationNumber() { return registrationNumber; }
+    public void setRegistrationNumber(String registrationNumber) { this.registrationNumber = registrationNumber; }
+
+    public String getWebsite() { return website; }
+    public void setWebsite(String website) { this.website = website; }
+
+    public String getAddress() { return address; }
+    public void setAddress(String address) { this.address = address; }
+
+    public String getPostalCode() { return postalCode; }
+    public void setPostalCode(String postalCode) { this.postalCode = postalCode; }
+
+    public String getDesignation() { return designation; }
+    public void setDesignation(String designation) { this.designation = designation; }
 
     public String getRemarks() { return remarks; }
     public void setRemarks(String remarks) { this.remarks = remarks; }

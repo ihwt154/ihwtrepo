@@ -61,6 +61,23 @@ public class ClientService {
         return clientRepository.findAll(spec, pageable);
     }
 
+    public List<ClientEntity> filterClientsList(String clientName, Boolean active, String city) {
+        Specification<ClientEntity> spec = (root, query, cb) -> {
+            List<Predicate> predicates = new ArrayList<>();
+            if (clientName != null && !clientName.trim().isEmpty()) {
+                predicates.add(cb.like(cb.lower(root.get("clientName")), "%" + clientName.toLowerCase() + "%"));
+            }
+            if (active != null) {
+                predicates.add(cb.equal(root.get("active"), active));
+            }
+            if (city != null && !city.trim().isEmpty()) {
+                predicates.add(cb.like(cb.lower(root.get("city")), "%" + city.toLowerCase() + "%"));
+            }
+            return cb.and(predicates.toArray(new Predicate[0]));
+        };
+        return clientRepository.findAll(spec);
+    }
+
     public void toggleActive(Long id) {
         ClientEntity c = findById(id);
         c.setActive(!Boolean.TRUE.equals(c.getActive()));

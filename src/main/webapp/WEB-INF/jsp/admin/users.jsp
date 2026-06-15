@@ -1,4 +1,4 @@
-﻿<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags" %>
 <sec:authentication property="principal.username" var="currentUser" />
@@ -171,6 +171,8 @@
                                                 </c:otherwise>
                                             </c:choose>
                                         </form>
+                                        <!-- Edit button -->
+                                        <button type="button" class="btn-action btn-edit" onclick="populateEditForm(${u.id}, '${u.username}', '${u.email}', '${u.firstName}', '${u.lastName}')">Edit</button>
                                     </c:if>
                                     <c:if test="${u.username == currentUser}">
                                         <span style="font-size:12px; color:var(--text-secondary); font-style:italic;">Logged In</span>
@@ -186,28 +188,41 @@
             <section class="form-card">
                 <h3>Create User Profile</h3>
                 <form action="${pageContext.request.contextPath}/admin/users/save" method="post">
-                    <div class="form-group">
-                        <label for="form-username">Username</label>
-                        <input type="text" id="form-username" name="username" required autocomplete="off">
-                    </div>
-                    <div class="form-group">
-                        <label for="form-password">Password</label>
-                        <input type="password" id="form-password" name="password" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="form-email">Email Address</label>
-                        <input type="email" id="form-email" name="email" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="form-firstname">First Name</label>
-                        <input type="text" id="form-firstname" name="firstName" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="form-lastname">Last Name</label>
-                        <input type="text" id="form-lastname" name="lastName" required>
-                    </div>
-                    <button type="submit" class="btn-primary" style="margin-top: 10px; width: 100%; padding: 12px; border: none; border-radius: 8px; color: white; font-weight: 600; cursor: pointer; transition: all var(--transition-speed);">Create Account</button>
-                </form>
+<input type="hidden" name="id" id="form-id" value="">
+<div class="form-group">
+    <label for="form-username">Username</label>
+    <input type="text" id="form-username" name="username" required autocomplete="off">
+</div>
+<div class="form-group">
+    <label for="form-password">Password</label>
+    <input type="password" id="form-password" name="password" required>
+</div>
+<div class="form-group">
+    <label for="form-email">Email Address</label>
+    <input type="email" id="form-email" name="email" required>
+</div>
+<div class="form-group">
+    <label for="form-firstname">First Name</label>
+    <input type="text" id="form-firstname" name="firstName" required>
+</div>
+<div class="form-group">
+    <label for="form-lastname">Last Name</label>
+    <input type="text" id="form-lastname" name="lastName" required>
+</div>
+<button type="submit" class="btn-primary" style="margin-top: 10px; width: 100%; padding: 12px; border: none; border-radius: 8px; color: white; font-weight: 600; cursor: pointer; transition: all var(--transition-speed);">Create Account</button>
+</form>
+<script>
+function populateEditForm(id, username, email, firstName, lastName) {
+    document.getElementById('form-id').value = id;
+    document.getElementById('form-username').value = username;
+    document.getElementById('form-email').value = email;
+    document.getElementById('form-firstname').value = firstName;
+    document.getElementById('form-lastname').value = lastName;
+    // Optionally change button text to 'Update Account'
+    const btn = document.querySelector('.form-card .btn-primary');
+    btn.textContent = 'Update Account';
+}
+</script>
             </section>
         </div>
     </main>

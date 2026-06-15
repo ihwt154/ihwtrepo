@@ -1,4 +1,4 @@
-﻿<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <!DOCTYPE html>
 <html lang="en">
@@ -14,7 +14,7 @@
 <div class="page-container" style="padding: 30px; max-width: 900px; margin: 0 auto;">
     <div class="page-header" style="margin-bottom: 24px;">
         <h2 style="color: var(--text-primary); font-size: 1.5rem; font-weight: 700;">Add New Lead</h2>
-        <a href="${pageContext.request.contextPath}/view_filter_leads" class="btn-secondary">â† Back to Leads</a>
+        <a href="${pageContext.request.contextPath}/view_filter_leads" class="btn-secondary">Back to Leads</a>
     </div>
 
     <c:if test="${not empty error}">
@@ -22,7 +22,7 @@
     </c:if>
 
     <div class="card" style="background: rgba(255,255,255,0.85); border-radius: 16px; padding: 32px; box-shadow: 0 4px 24px rgba(0,0,0,0.08);">
-        <form action="${pageContext.request.contextPath}/create_lead" method="post">
+        <form id="leadForm" action="${pageContext.request.contextPath}/create_lead" method="post">
 
             <%-- Client Search --%>
             <div class="form-section-title" style="font-weight:600; color: var(--accent-primary); margin-bottom:16px; border-bottom: 2px solid var(--accent-primary); padding-bottom:8px;">Client Information</div>
@@ -38,31 +38,20 @@
                     <input type="text" id="leadName" name="leadName" style="width:100%; padding:10px; border:1px solid #e2e8f0; border-radius:8px;">
                 </div>
             </div>
-
-            <%-- Contact Info --%>
-            <div class="form-section-title" style="font-weight:600; color: var(--accent-primary); margin-bottom:16px; border-bottom: 2px solid var(--accent-primary); padding-bottom:8px; margin-top:24px;">Contact Details</div>
             <div class="form-row" style="display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:16px;">
                 <div class="form-group">
-                    <label for="email">Email</label>
-                    <input type="email" id="email" name="email" style="width:100%; padding:10px; border:1px solid #e2e8f0; border-radius:8px;">
+                    <label for="leadTitle">Lead Title</label>
+                    <input type="text" id="leadTitle" name="leadTitle" style="width:100%; padding:10px; border:1px solid #e2e8f0; border-radius:8px;">
                 </div>
                 <div class="form-group">
-                    <label for="mobileNumber">Mobile Number</label>
-                    <input type="text" id="mobileNumber" name="mobileNumber" style="width:100%; padding:10px; border:1px solid #e2e8f0; border-radius:8px;">
-                </div>
-                <div class="form-group">
-                    <label for="city">City</label>
-                    <input type="text" id="city" name="city" style="width:100%; padding:10px; border:1px solid #e2e8f0; border-radius:8px;">
-                </div>
-                <div class="form-group">
-                    <label for="country">Country</label>
-                    <input type="text" id="country" name="country" style="width:100%; padding:10px; border:1px solid #e2e8f0; border-radius:8px;">
+                    <label for="eventName">Event Name</label>
+                    <input type="text" id="eventName" name="eventName" style="width:100%; padding:10px; border:1px solid #e2e8f0; border-radius:8px;">
                 </div>
             </div>
 
             <%-- Lead Classification --%>
             <div class="form-section-title" style="font-weight:600; color: var(--accent-primary); margin-bottom:16px; border-bottom: 2px solid var(--accent-primary); padding-bottom:8px; margin-top:24px;">Lead Classification</div>
-            <div class="form-row" style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:16px; margin-bottom:16px;">
+            <div class="form-row" style="display:grid; grid-template-columns:1fr 1fr 1fr 1fr; gap:16px; margin-bottom:16px;">
                 <div class="form-group">
                     <label for="leadStatus">Status <span style="color:red">*</span></label>
                     <select id="leadStatus" name="leadStatus" style="width:100%; padding:10px; border:1px solid #e2e8f0; border-radius:8px;" required>
@@ -72,21 +61,22 @@
                         </c:forEach>
                     </select>
                 </div>
-                <div class="form-group">
-                    <label for="leadSource">Source</label>
-                    <select id="leadSource" name="leadSource" style="width:100%; padding:10px; border:1px solid #e2e8f0; border-radius:8px;">
-                        <option value="">-- Select Source --</option>
-                        <c:forEach var="src" items="${LEAD_SOURCES}">
-                            <option value="${src}">${src}</option>
-                        </c:forEach>
-                    </select>
-                </div>
+
                 <div class="form-group">
                     <label for="priority">Priority</label>
                     <select id="priority" name="priority" style="width:100%; padding:10px; border:1px solid #e2e8f0; border-radius:8px;">
                         <option value="">-- Select Priority --</option>
                         <c:forEach var="p" items="${PRIORITIES}">
                             <option value="${p}">${p}</option>
+                        </c:forEach>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="leadSource">Lead Source</label>
+                    <select id="leadSource" name="leadSource" style="width:100%; padding:10px; border:1px solid #e2e8f0; border-radius:8px;">
+                        <option value="">-- Select Source --</option>
+                        <c:forEach var="src" items="${CLIENT_SOURCES}">
+                            <option value="${src.sourceName}">${src.sourceName}</option>
                         </c:forEach>
                     </select>
                 </div>
@@ -148,6 +138,22 @@
                 dropdown.style.display = 'block';
             });
     });
+    searchInput.addEventListener('blur', function() {
+        setTimeout(() => {
+            if (!clientIdInput.value) {
+                searchInput.value = '';
+            }
+        }, 200);
+    });
+    
+    document.getElementById('leadForm').addEventListener('submit', function(e) {
+        if (!clientIdInput.value) {
+            e.preventDefault();
+            alert('Please select a valid Client from the dropdown before creating a lead.');
+            searchInput.focus();
+        }
+    });
+
     document.addEventListener('click', e => { if (!e.target.closest('#clientSearch')) dropdown.style.display='none'; });
 })();
 </script>

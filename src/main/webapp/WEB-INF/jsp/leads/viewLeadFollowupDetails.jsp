@@ -1,4 +1,4 @@
-﻿<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <!DOCTYPE html>
@@ -26,11 +26,11 @@
             <h2 style="font-size:1.5rem; font-weight:700; color:var(--text-primary); margin:0;">Lead Followups</h2>
             <p style="color:#64748b; margin:4px 0 0;">
                 <strong>${LEAD_OBJ.leadName}</strong>
-                <c:if test="${not empty LEAD_OBJ.clientName}"> Â· ${LEAD_OBJ.clientName}</c:if>
-                <c:if test="${not empty LEAD_OBJ.leadStatus}"> Â· <span style="background:#dbeafe;color:#1d4ed8;padding:2px 8px;border-radius:10px;font-size:0.78rem;">${LEAD_OBJ.leadStatus}</span></c:if>
+                <c:if test="${not empty LEAD_OBJ.clientName}"> &middot; ${LEAD_OBJ.clientName}</c:if>
+                <c:if test="${not empty LEAD_OBJ.leadStatus}"> &middot; <span style="background:#dbeafe;color:#1d4ed8;padding:2px 8px;border-radius:10px;font-size:0.78rem;">${LEAD_OBJ.leadStatus}</span></c:if>
             </p>
         </div>
-        <a href="${pageContext.request.contextPath}/view_filter_leads" style="padding:9px 18px;background:#f1f5f9;color:#475569;border-radius:8px;text-decoration:none;">â† All Leads</a>
+        <a href="${pageContext.request.contextPath}/view_filter_leads" style="padding:9px 18px;background:#f1f5f9;color:#475569;border-radius:8px;text-decoration:none;">All Leads</a>
     </div>
 
     <c:if test="${not empty success}"><div style="background:#d1fae5;color:#065f46;padding:12px;border-radius:8px;margin-bottom:16px;">${success}</div></c:if>
@@ -72,13 +72,13 @@
             <c:forEach var="f" items="${FOLLOWUP_LIST}">
                 <div class="followup-card">
                     <div class="followup-meta">
-                        ðŸ• Action at: <strong>${f.formattedFollowupTime}</strong>
-                        <c:if test="${not empty f.updatedByName}"> Â· by <strong>${f.updatedByName}</strong></c:if>
+                        Action at: <strong>${f.formattedFollowupTime}</strong>
+                        <c:if test="${not empty f.updatedByName}"> &middot; by <strong>${f.updatedByName}</strong></c:if>
                     </div>
                     <div class="followup-section">Response:</div>
                     <div class="followup-content" style="margin-bottom:10px;">${f.response}</div>
                     <c:if test="${not empty f.formattedNextFollowupTime}">
-                        <div class="followup-meta" style="margin-top:8px;">â­ Next followup: <strong>${f.formattedNextFollowupTime}</strong></div>
+                        <div class="followup-meta" style="margin-top:8px;">Next followup: <strong>${f.formattedNextFollowupTime}</strong></div>
                         <div class="followup-section">Next Action:</div>
                         <div class="followup-content">${f.nextactionplan}</div>
                     </c:if>

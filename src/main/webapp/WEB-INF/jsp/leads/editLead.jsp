@@ -1,4 +1,4 @@
-﻿<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <!DOCTYPE html>
 <html lang="en">
@@ -14,11 +14,11 @@
 <div class="page-container" style="padding:30px; max-width:900px; margin:0 auto;">
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:24px;">
         <h2 style="font-size:1.5rem; font-weight:700; color:var(--text-primary);">Edit Lead</h2>
-        <a href="${pageContext.request.contextPath}/view_filter_leads" style="padding:9px 18px; background:#f1f5f9; color:#475569; border-radius:8px; text-decoration:none;">â† Back to Leads</a>
+        <a href="${pageContext.request.contextPath}/view_filter_leads" style="padding:9px 18px; background:#f1f5f9; color:#475569; border-radius:8px; text-decoration:none;">Back to Leads</a>
     </div>
 
     <div class="card" style="background:rgba(255,255,255,0.85); border-radius:16px; padding:32px; box-shadow:0 4px 24px rgba(0,0,0,0.08);">
-        <form action="${pageContext.request.contextPath}/edit_lead" method="post">
+        <form id="leadForm" action="${pageContext.request.contextPath}/edit_lead" method="post">
             <input type="hidden" name="leadId" value="${LEAD_OBJ.leadId}">
 
             <%-- Client --%>
@@ -35,41 +35,39 @@
                     <input type="text" name="leadName" value="${LEAD_OBJ.leadName}" style="width:100%;padding:10px;border:1px solid #e2e8f0;border-radius:8px;">
                 </div>
             </div>
-
-            <%-- Contact --%>
-            <div class="form-section-title" style="font-weight:600; color:var(--accent-primary); margin:24px 0 16px; border-bottom:2px solid var(--accent-primary); padding-bottom:8px;">Contact Details</div>
             <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:16px;">
-                <div><label style="display:block;margin-bottom:4px;font-size:0.85rem;font-weight:600;color:#64748b;">Email</label>
-                    <input type="email" name="email" value="${LEAD_OBJ.email}" style="width:100%;padding:10px;border:1px solid #e2e8f0;border-radius:8px;"></div>
-                <div><label style="display:block;margin-bottom:4px;font-size:0.85rem;font-weight:600;color:#64748b;">Mobile</label>
-                    <input type="text" name="mobileNumber" value="${LEAD_OBJ.mobileNumber}" style="width:100%;padding:10px;border:1px solid #e2e8f0;border-radius:8px;"></div>
-                <div><label style="display:block;margin-bottom:4px;font-size:0.85rem;font-weight:600;color:#64748b;">City</label>
-                    <input type="text" name="city" value="${LEAD_OBJ.city}" style="width:100%;padding:10px;border:1px solid #e2e8f0;border-radius:8px;"></div>
-                <div><label style="display:block;margin-bottom:4px;font-size:0.85rem;font-weight:600;color:#64748b;">Country</label>
-                    <input type="text" name="country" value="${LEAD_OBJ.country}" style="width:100%;padding:10px;border:1px solid #e2e8f0;border-radius:8px;"></div>
+                <div>
+                    <label style="display:block;margin-bottom:4px;font-size:0.85rem;font-weight:600;color:#64748b;">Lead Title</label>
+                    <input type="text" name="leadTitle" value="${LEAD_OBJ.leadTitle}" style="width:100%;padding:10px;border:1px solid #e2e8f0;border-radius:8px;">
+                </div>
+                <div>
+                    <label style="display:block;margin-bottom:4px;font-size:0.85rem;font-weight:600;color:#64748b;">Event Name</label>
+                    <input type="text" name="eventName" value="${LEAD_OBJ.eventName}" style="width:100%;padding:10px;border:1px solid #e2e8f0;border-radius:8px;">
+                </div>
             </div>
 
             <%-- Classification --%>
             <div class="form-section-title" style="font-weight:600; color:var(--accent-primary); margin:24px 0 16px; border-bottom:2px solid var(--accent-primary); padding-bottom:8px;">Classification</div>
-            <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:16px; margin-bottom:16px;">
+            <div style="display:grid; grid-template-columns:1fr 1fr 1fr 1fr; gap:16px; margin-bottom:16px;">
                 <div><label style="display:block;margin-bottom:4px;font-size:0.85rem;font-weight:600;color:#64748b;">Status</label>
                     <select name="leadStatus" style="width:100%;padding:10px;border:1px solid #e2e8f0;border-radius:8px;">
                         <c:forEach var="s" items="${LEAD_STATUSES}">
                             <option value="${s}" ${LEAD_OBJ.leadStatus == s ? 'selected' : ''}>${s}</option>
                         </c:forEach>
                     </select></div>
-                <div><label style="display:block;margin-bottom:4px;font-size:0.85rem;font-weight:600;color:#64748b;">Source</label>
-                    <select name="leadSource" style="width:100%;padding:10px;border:1px solid #e2e8f0;border-radius:8px;">
-                        <option value="">-- Source --</option>
-                        <c:forEach var="src" items="${LEAD_SOURCES}">
-                            <option value="${src}" ${LEAD_OBJ.leadSource == src ? 'selected' : ''}>${src}</option>
-                        </c:forEach>
-                    </select></div>
+
                 <div><label style="display:block;margin-bottom:4px;font-size:0.85rem;font-weight:600;color:#64748b;">Priority</label>
                     <select name="priority" style="width:100%;padding:10px;border:1px solid #e2e8f0;border-radius:8px;">
                         <option value="">-- Priority --</option>
                         <c:forEach var="p" items="${PRIORITIES}">
                             <option value="${p}" ${LEAD_OBJ.priority == p ? 'selected' : ''}>${p}</option>
+                        </c:forEach>
+                    </select></div>
+                <div><label style="display:block;margin-bottom:4px;font-size:0.85rem;font-weight:600;color:#64748b;">Lead Source</label>
+                    <select name="leadSource" style="width:100%;padding:10px;border:1px solid #e2e8f0;border-radius:8px;">
+                        <option value="">-- Select Source --</option>
+                        <c:forEach var="src" items="${CLIENT_SOURCES}">
+                            <option value="${src.sourceName}" ${LEAD_OBJ.leadSource == src.sourceName ? 'selected' : ''}>${src.sourceName}</option>
                         </c:forEach>
                     </select></div>
                 <div><label style="display:block;margin-bottom:4px;font-size:0.85rem;font-weight:600;color:#64748b;">Assigned To</label>
@@ -105,6 +103,22 @@
             dd.style.display='block';
         });
     });
+    si.addEventListener('blur', function() {
+        setTimeout(() => {
+            if (!ci.value) {
+                si.value = '';
+            }
+        }, 200);
+    });
+    
+    document.getElementById('leadForm').addEventListener('submit', function(e) {
+        if (!ci.value) {
+            e.preventDefault();
+            alert('Please select a valid Client from the dropdown before updating the lead.');
+            si.focus();
+        }
+    });
+
     document.addEventListener('click', e => { if (!e.target.closest('#clientSearch')) dd.style.display='none'; });
 })();
 </script>

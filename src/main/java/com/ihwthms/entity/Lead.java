@@ -19,6 +19,9 @@ public class Lead {
     @Column(name = "leadCode", length = 50)
     private String leadCode;
 
+    @Column(name = "leadTitle", length = 200)
+    private String leadTitle;
+
     @Column(name = "leadName", length = 100)
     private String leadName;
 
@@ -37,8 +40,11 @@ public class Lead {
     @Column(name = "leadStatus", length = 50)
     private String leadStatus;
 
-    @Column(name = "leadSource", length = 50)
+    @Column(name = "leadSource", length = 100)
     private String leadSource;
+
+    @Column(name = "eventName", length = 200)
+    private String eventName;
 
     @Column(name = "priority", length = 50)
     private String priority;
@@ -64,10 +70,6 @@ public class Lead {
     @Column(name = "isActive")
     private Boolean isActive = true;
 
-    /**
-     * Link to the client this lead belongs to.
-     * Hibernate will add clientId FK column to leads_master via ddl-auto=update.
-     */
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "clientId")
     private ClientEntity client;
@@ -83,6 +85,9 @@ public class Lead {
 
     public String getLeadCode() { return leadCode; }
     public void setLeadCode(String leadCode) { this.leadCode = leadCode; }
+
+    public String getLeadTitle() { return leadTitle; }
+    public void setLeadTitle(String leadTitle) { this.leadTitle = leadTitle; }
 
     public String getLeadName() { return leadName; }
     public void setLeadName(String leadName) { this.leadName = leadName; }
@@ -104,6 +109,9 @@ public class Lead {
 
     public String getLeadSource() { return leadSource; }
     public void setLeadSource(String leadSource) { this.leadSource = leadSource; }
+
+    public String getEventName() { return eventName; }
+    public void setEventName(String eventName) { this.eventName = eventName; }
 
     public String getPriority() { return priority; }
     public void setPriority(String priority) { this.priority = priority; }
