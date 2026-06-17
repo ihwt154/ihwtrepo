@@ -55,6 +55,7 @@ public class SettingsController {
 
         try {
             if (logoFile != null && !logoFile.isEmpty()) {
+                dto.setLogoFile(logoFile);
                 dto.setLogoPath("/logo.png");
             }
             centralConfigService.saveOrUpdateCentralConfig(dto);
@@ -78,7 +79,9 @@ public class SettingsController {
                 contentType = "image/png";
             }
             headers.setContentType(org.springframework.http.MediaType.parseMediaType(contentType));
-            headers.setCacheControl("max-age=86400"); // Cache for 1 day
+            headers.setCacheControl("no-cache, no-store, must-revalidate");
+            headers.setPragma("no-cache");
+            headers.setExpires(0);
             return new org.springframework.http.ResponseEntity<>(entity.getLogoData(), headers, org.springframework.http.HttpStatus.OK);
         }
         return new org.springframework.http.ResponseEntity<>(org.springframework.http.HttpStatus.NOT_FOUND);
