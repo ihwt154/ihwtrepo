@@ -12,9 +12,6 @@ public class ClientEntity {
     @Column(name = "clientId")
     private Long clientId;
 
-    @Column(name = "clientCode", length = 50, unique = true)
-    private String clientCode;
-
     @Column(name = "clientName", nullable = false)
     private String clientName;
 
@@ -88,9 +85,6 @@ public class ClientEntity {
     // Getters & Setters
     public Long getClientId() { return clientId; }
     public void setClientId(Long clientId) { this.clientId = clientId; }
-
-    public String getClientCode() { return clientCode; }
-    public void setClientCode(String clientCode) { this.clientCode = clientCode; }
 
     public String getClientName() { return clientName; }
     public void setClientName(String clientName) { this.clientName = clientName; }

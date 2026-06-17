@@ -63,23 +63,31 @@ public class LeadService {
     private void addStatusPredicate(List<Predicate> predicates,
                                      javax.persistence.criteria.Root<Lead> root,
                                      javax.persistence.criteria.CriteriaBuilder cb,
-                                     String leadStatus) {
-        if (leadStatus == null || leadStatus.trim().isEmpty()) return;
+                                     List<String> leadStatuses) {
+        if (leadStatuses == null || leadStatuses.isEmpty()) return;
 
-        if ("Open".equalsIgnoreCase(leadStatus.trim())) {
-            predicates.add(root.get("leadStatus").in(OPEN_STATUSES));
-        } else if ("Closed".equalsIgnoreCase(leadStatus.trim())) {
-            predicates.add(root.get("leadStatus").in(CLOSED_STATUSES));
-        } else {
-            // direct / exact status
-            predicates.add(cb.equal(root.get("leadStatus"), leadStatus));
+        java.util.Set<String> targetStatuses = new java.util.HashSet<>();
+        for (String status : leadStatuses) {
+            if (status == null || status.trim().isEmpty()) continue;
+
+            if ("OpenGroup".equalsIgnoreCase(status.trim())) {
+                targetStatuses.addAll(OPEN_STATUSES);
+            } else if ("ClosedGroup".equalsIgnoreCase(status.trim())) {
+                targetStatuses.addAll(CLOSED_STATUSES);
+            } else {
+                targetStatuses.add(status.trim());
+            }
+        }
+
+        if (!targetStatuses.isEmpty()) {
+            predicates.add(root.get("leadStatus").in(targetStatuses));
         }
     }
 
     /**
      * Dynamic paginated filter matching vistalux pattern.
      */
-    public Page<Lead> filterLeads(int pageNo, int pageSize, String leadStatus,
+    public Page<Lead> filterLeads(int pageNo, int pageSize, List<String> leadStatus,
                                    String leadSource, String clientName,
                                    Long assignedTo, String priority) {
         Pageable pageable = PageRequest.of(pageNo, pageSize, Sort.by(Sort.Direction.DESC, "id"));
@@ -113,7 +121,7 @@ public class LeadService {
     /**
      * Unpaginated version of filterLeads – used for Excel/PDF exports.
      */
-    public List<Lead> filterLeadsList(String leadStatus, String leadSource,
+    public List<Lead> filterLeadsList(List<String> leadStatus, String leadSource,
                                        String clientName, Long assignedTo, String priority) {
         Specification<Lead> spec = (root, query, cb) -> {
             List<Predicate> predicates = new ArrayList<>();

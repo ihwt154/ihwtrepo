@@ -13,8 +13,30 @@
         .client-table th { background:var(--accent-primary); color:#fff; padding:12px 16px; text-align:left; font-size:0.8rem; text-transform:uppercase; letter-spacing:.05em; }
         .client-table td { padding:12px 16px; border-bottom:1px solid #f1f5f9; font-size:0.9rem; }
         .client-table tr:hover td { background:#f8fafc; }
-        .badge-active { background:#d1fae5; color:#065f46; padding:3px 10px; border-radius:20px; font-size:0.75rem; font-weight:600; }
+        .badge-active   { background:#d1fae5; color:#065f46; padding:3px 10px; border-radius:20px; font-size:0.75rem; font-weight:600; }
         .badge-inactive { background:#fee2e2; color:#991b1b; padding:3px 10px; border-radius:20px; font-size:0.75rem; font-weight:600; }
+
+        /* ── Confirmation Modal ─────────────────────────────────── */
+        .confirm-overlay {
+            display: none; position: fixed; inset: 0;
+            background: rgba(15,23,42,0.55); backdrop-filter: blur(3px);
+            z-index: 2000; justify-content: center; align-items: center;
+        }
+        .confirm-overlay.open { display: flex; }
+        .confirm-box {
+            background: #fff; border-radius: 16px; padding: 32px 28px; width: 380px;
+            max-width: 92%; box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+            animation: popIn .2s ease;
+        }
+        @keyframes popIn { from { transform:scale(.92); opacity:0; } to { transform:scale(1); opacity:1; } }
+        .confirm-icon { font-size: 2.2rem; text-align: center; margin-bottom: 12px; }
+        .confirm-title { font-size: 1.1rem; font-weight: 700; color: #1e293b; text-align: center; margin-bottom: 6px; }
+        .confirm-msg   { font-size: 0.9rem; color: #64748b; text-align: center; margin-bottom: 24px; line-height: 1.5; }
+        .confirm-actions { display: flex; gap: 10px; justify-content: center; }
+        .btn-cancel { padding: 9px 22px; background: #f1f5f9; color: #475569; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 0.9rem; font-weight: 600; cursor: pointer; }
+        .btn-confirm-ok { padding: 9px 22px; border: none; border-radius: 8px; font-size: 0.9rem; font-weight: 600; cursor: pointer; }
+        .btn-danger  { background: #ef4444; color: #fff; }
+        .btn-success { background: #10b981; color: #fff; }
     </style>
 </head>
 <body>
@@ -22,7 +44,8 @@
 <div class="page-container" style="padding:30px;">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
         <h2 style="font-size:1.5rem;font-weight:700;color:var(--text-primary);">Manage Clients</h2>
-        <a href="${pageContext.request.contextPath}/view_add_client_form" style="padding:10px 20px;background:var(--accent-primary);color:#fff;border-radius:8px;text-decoration:none;font-weight:600;">+ Add Client</a>
+        <a href="${pageContext.request.contextPath}/view_add_client_form"
+           style="padding:10px 20px;background:var(--accent-primary);color:#fff;border-radius:8px;text-decoration:none;font-weight:600;">+ Add Client</a>
     </div>
 
     <c:if test="${not empty success}"><div style="background:#d1fae5;color:#065f46;padding:12px;border-radius:8px;margin-bottom:16px;">${success}</div></c:if>
@@ -30,7 +53,8 @@
 
     <%-- Filter Form --%>
     <div style="background:rgba(255,255,255,0.85);border-radius:14px;padding:20px 24px;box-shadow:0 2px 12px rgba(0,0,0,0.06);margin-bottom:20px;">
-        <form method="get" action="${pageContext.request.contextPath}/view_clients_list" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;align-items:end;">
+        <form method="get" action="${pageContext.request.contextPath}/view_clients_list"
+              style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;align-items:end;">
             <div>
                 <label style="font-size:0.8rem;font-weight:600;color:#64748b;display:block;margin-bottom:4px;">Client Name</label>
                 <input type="text" name="clientName" value="${f_clientName}" style="width:100%;padding:8px;border:1px solid #e2e8f0;border-radius:8px;">
@@ -43,24 +67,25 @@
                 <label style="font-size:0.8rem;font-weight:600;color:#64748b;display:block;margin-bottom:4px;">Status</label>
                 <select name="active" style="width:100%;padding:8px;border:1px solid #e2e8f0;border-radius:8px;">
                     <option value="">All</option>
-                    <option value="true" ${f_active == true ? 'selected' : ''}>Active</option>
+                    <option value="true"  ${f_active == true  ? 'selected' : ''}>Active</option>
                     <option value="false" ${f_active == false ? 'selected' : ''}>Inactive</option>
                 </select>
             </div>
             <div style="display:flex;gap:8px;">
                 <button type="submit" style="padding:8px 16px;background:var(--accent-primary);color:#fff;border:none;border-radius:8px;cursor:pointer;font-weight:600;flex:1;">Filter</button>
-                <a href="${pageContext.request.contextPath}/view_clients_list" style="padding:8px 14px;background:#f1f5f9;color:#475569;border-radius:8px;text-decoration:none;display:flex;align-items:center;">Reset</a>
+                <a href="${pageContext.request.contextPath}/view_clients_list"
+                   style="padding:8px 14px;background:#f1f5f9;color:#475569;border-radius:8px;text-decoration:none;display:flex;align-items:center;">Reset</a>
             </div>
         </form>
     </div>
 
-    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
         <p style="font-size:0.85rem;color:#64748b;margin:0;">Showing <strong>${CLIENT_LIST.size()}</strong> of <strong>${totalClients}</strong> clients</p>
-        <div style="display:flex; gap:8px;">
+        <div style="display:flex;gap:8px;">
             <a href="${pageContext.request.contextPath}/clients/export/excel?clientName=${f_clientName}&city=${f_city}&active=${f_active}"
-               style="padding:6px 12px;background:#10b981;color:#fff;border-radius:6px;text-decoration:none;font-size:0.8rem;font-weight:600;display:inline-flex;align-items:center;">Export Excel</a>
+               style="padding:6px 12px;background:#10b981;color:#fff;border-radius:6px;text-decoration:none;font-size:0.8rem;font-weight:600;">Export Excel</a>
             <a href="${pageContext.request.contextPath}/clients/export/pdf?clientName=${f_clientName}&city=${f_city}&active=${f_active}"
-               style="padding:6px 12px;background:#ef4444;color:#fff;border-radius:6px;text-decoration:none;font-size:0.8rem;font-weight:600;display:inline-flex;align-items:center;">Export PDF</a>
+               style="padding:6px 12px;background:#ef4444;color:#fff;border-radius:6px;text-decoration:none;font-size:0.8rem;font-weight:600;">Export PDF</a>
         </div>
     </div>
 
@@ -95,13 +120,16 @@
                                    style="padding:5px 12px;background:#f1f5f9;color:#475569;border-radius:6px;text-decoration:none;font-size:0.78rem;font-weight:600;border:1px solid #e2e8f0;">View</a>
                                 <a href="${pageContext.request.contextPath}/view_edit_client_form?clientId=${client.clientId}"
                                    style="padding:5px 12px;background:#dbeafe;color:#1d4ed8;border-radius:6px;text-decoration:none;font-size:0.78rem;font-weight:600;border:1px solid #bfdbfe;">Edit</a>
-                                <form method="post" action="${pageContext.request.contextPath}/toggle_client" style="display:inline;" onsubmit="return confirm('Toggle client status?');">
+                                <%-- Toggle button triggers modal, not browser confirm() --%>
+                                <form id="toggleForm_${client.clientId}" method="post"
+                                      action="${pageContext.request.contextPath}/toggle_client" style="display:none;">
                                     <input type="hidden" name="clientId" value="${client.clientId}">
-                                    <button type="submit"
-                                            style="padding:5px 12px;background:${client.active ? '#fee2e2' : '#d1fae5'};color:${client.active ? '#b91c1c' : '#065f46'};border:1px solid ${client.active ? '#fca5a5' : '#a7f3d0'};border-radius:6px;cursor:pointer;font-size:0.78rem;font-weight:600;">
-                                        ${client.active ? 'Deactivate' : 'Activate'}
-                                    </button>
                                 </form>
+                                <button type="button"
+                                        onclick="openConfirm('${client.clientId}','${client.clientName}',${client.active})"
+                                        style="padding:5px 12px;background:${client.active ? '#fee2e2' : '#d1fae5'};color:${client.active ? '#b91c1c' : '#065f46'};border:1px solid ${client.active ? '#fca5a5' : '#a7f3d0'};border-radius:6px;cursor:pointer;font-size:0.78rem;font-weight:600;">
+                                    ${client.active ? 'Deactivate' : 'Activate'}
+                                </button>
                             </div>
                         </td>
                     </tr>
@@ -112,17 +140,63 @@
 
     <c:if test="${totalPages > 1}">
         <div style="display:flex;gap:8px;margin-top:20px;justify-content:center;">
-            <c:if test="${currentPage > 0}"><a href="?page=${currentPage-1}&pageSize=${pageSize}&clientName=${f_clientName}&city=${f_city}&active=${f_active}" style="padding:8px 14px;background:#f1f5f9;border-radius:8px;text-decoration:none;color:#475569;">Prev</a></c:if>
+            <c:if test="${currentPage > 0}">
+                <a href="?page=${currentPage-1}&pageSize=${pageSize}&clientName=${f_clientName}&city=${f_city}&active=${f_active}"
+                   style="padding:8px 14px;background:#f1f5f9;border-radius:8px;text-decoration:none;color:#475569;">Prev</a>
+            </c:if>
             <c:forEach begin="0" end="${totalPages-1}" var="p">
                 <c:choose>
                     <c:when test="${p==currentPage}"><span style="padding:8px 14px;background:var(--accent-primary);color:#fff;border-radius:8px;">${p+1}</span></c:when>
-                    <c:otherwise><a href="?page=${p}&pageSize=${pageSize}&clientName=${f_clientName}&city=${f_city}&active=${f_active}" style="padding:8px 14px;background:#f1f5f9;border-radius:8px;text-decoration:none;color:#475569;">${p+1}</a></c:otherwise>
+                    <c:otherwise><a href="?page=${p}&pageSize=${pageSize}&clientName=${f_clientName}&city=${f_city}&active=${f_active}"
+                                    style="padding:8px 14px;background:#f1f5f9;border-radius:8px;text-decoration:none;color:#475569;">${p+1}</a></c:otherwise>
                 </c:choose>
             </c:forEach>
-            <c:if test="${currentPage < totalPages-1}"><a href="?page=${currentPage+1}&pageSize=${pageSize}&clientName=${f_clientName}&city=${f_city}&active=${f_active}" style="padding:8px 14px;background:#f1f5f9;border-radius:8px;text-decoration:none;color:#475569;">Next</a></c:if>
+            <c:if test="${currentPage < totalPages-1}">
+                <a href="?page=${currentPage+1}&pageSize=${pageSize}&clientName=${f_clientName}&city=${f_city}&active=${f_active}"
+                   style="padding:8px 14px;background:#f1f5f9;border-radius:8px;text-decoration:none;color:#475569;">Next</a>
+            </c:if>
         </div>
     </c:if>
 </div>
+
+<!-- ── Confirmation Modal ─────────────────────────────────────────── -->
+<div id="confirmOverlay" class="confirm-overlay">
+    <div class="confirm-box">
+        <div class="confirm-icon" id="confirmIcon">⚠️</div>
+        <div class="confirm-title" id="confirmTitle">Change Client Status?</div>
+        <div class="confirm-msg"  id="confirmMsg">Are you sure?</div>
+        <div class="confirm-actions">
+            <button class="btn-cancel" onclick="closeConfirm()">Cancel</button>
+            <button id="confirmOkBtn" class="btn-confirm-ok btn-danger" onclick="submitToggle()">Confirm</button>
+        </div>
+    </div>
+</div>
+
+<script>
+var _pendingFormId = null;
+
+function openConfirm(clientId, clientName, isActive) {
+    _pendingFormId = 'toggleForm_' + clientId;
+    document.getElementById('confirmIcon').textContent  = isActive ? '🔴' : '🟢';
+    document.getElementById('confirmTitle').textContent = isActive ? 'Deactivate Client?' : 'Activate Client?';
+    document.getElementById('confirmMsg').textContent   = isActive
+        ? 'Deactivating "' + clientName + '" will hide them from all future lead searches.'
+        : 'Activating "' + clientName + '" will make them available in lead searches again.';
+    var btn = document.getElementById('confirmOkBtn');
+    btn.textContent  = isActive ? 'Yes, Deactivate' : 'Yes, Activate';
+    btn.className    = 'btn-confirm-ok ' + (isActive ? 'btn-danger' : 'btn-success');
+    document.getElementById('confirmOverlay').classList.add('open');
+}
+function closeConfirm() {
+    document.getElementById('confirmOverlay').classList.remove('open');
+    _pendingFormId = null;
+}
+function submitToggle() {
+    if (_pendingFormId) document.getElementById(_pendingFormId).submit();
+}
+document.getElementById('confirmOverlay').addEventListener('click', function(e) {
+    if (e.target === this) closeConfirm();
+});
+</script>
 </body>
 </html>
-

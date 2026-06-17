@@ -112,12 +112,7 @@ public class LeadController {
             return "redirect:/view_add_lead_form";
         }
 
-        // Ensure client has mobile and email
-        if (client.getMobile() == null || client.getMobile().trim().isEmpty()
-                || client.getEmailId() == null || client.getEmailId().trim().isEmpty()) {
-            ra.addFlashAttribute("error", "Client must have a mobile number and email configured.");
-            return "redirect:/view_add_lead_form";
-        }
+        // Client mobile/email are optional — lead can still be created without them
 
         // Create new Lead entity and populate from DTO
         Lead lead = new Lead();
@@ -129,12 +124,21 @@ public class LeadController {
             lead.setLeadName(client.getClientName());
         }
 
-        // Set client-related details on the lead
+        // Set client contact details on the lead
         lead.setClient(client);
         lead.setMobileNumber(client.getMobile());
         lead.setEmail(client.getEmailId());
         lead.setCity(client.getCity());
         lead.setCountry(client.getCountry());
+
+        // Auto-populate organisation fields from the linked client (stored in DB, not shown on form)
+        lead.setOrganizationName(client.getOrganizationName());
+        lead.setOrganizationType(client.getOrganizationType());
+        lead.setRegistrationNumber(client.getRegistrationNumber());
+        lead.setWebsite(client.getWebsite());
+        lead.setAddress(client.getAddress());
+        lead.setPostalCode(client.getPostalCode());
+        lead.setDesignation(client.getDesignation());
 
         // Persist and notify
         leadService.saveLead(lead);
@@ -148,7 +152,7 @@ public class LeadController {
     public ModelAndView viewFilterLeads(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int pageSize,
-            @RequestParam(required = false) String leadStatus,
+            @RequestParam(required = false) List<String> leadStatus,
             @RequestParam(required = false) String leadSource,
             @RequestParam(required = false) String clientName,
             @RequestParam(required = false) Long assignedTo,
@@ -163,6 +167,15 @@ public class LeadController {
             dtoList.add(buildLeadDTO(lead));
         }
 
+        String statusJoined = "";
+        if (leadStatus != null && !leadStatus.isEmpty()) {
+            List<String> activeList = new java.util.ArrayList<>();
+            for (String s : leadStatus) {
+                if (s != null && !s.trim().isEmpty()) activeList.add(s.trim());
+            }
+            statusJoined = String.join(",", activeList);
+        }
+
         mv.addObject("LEADS_LIST", dtoList);
         mv.addObject("currentPage", page);
         mv.addObject("totalPages", pagedLeads.getTotalPages());
@@ -173,6 +186,7 @@ public class LeadController {
         mv.addObject("PRIORITIES", PRIORITIES);
         mv.addObject("CLIENT_SOURCES", clientSourceService.findAllActive());
         mv.addObject("f_leadStatus", leadStatus);
+        mv.addObject("f_leadStatusString", statusJoined);
         mv.addObject("f_leadSource", leadSource);
         mv.addObject("f_clientName", clientName);
         mv.addObject("f_assignedTo", assignedTo);
@@ -281,7 +295,7 @@ public class LeadController {
     // ─── EXPORT EXCEL ────────────────────────────────────────────────────────
     @GetMapping("/leads/export/excel")
     public void exportToExcel(
-            @RequestParam(required = false) String leadStatus,
+            @RequestParam(required = false) List<String> leadStatus,
             @RequestParam(required = false) String leadSource,
             @RequestParam(required = false) String clientName,
             @RequestParam(required = false) Long assignedTo,
@@ -347,7 +361,7 @@ public class LeadController {
     // ─── EXPORT PDF ──────────────────────────────────────────────────────────
     @GetMapping("/leads/export/pdf")
     public void exportToPdf(
-            @RequestParam(required = false) String leadStatus,
+            @RequestParam(required = false) List<String> leadStatus,
             @RequestParam(required = false) String leadSource,
             @RequestParam(required = false) String clientName,
             @RequestParam(required = false) Long assignedTo,
@@ -408,17 +422,32 @@ public class LeadController {
         document.close();
     }
 
-    // ─── JSON: client typeahead ───────────────────────────────────────────────
+    // ─── JSON: client typeahead ──────────────────────────────────────────────────
     @GetMapping("/getClientList")
     @ResponseBody
-    public List<Map<String, Object>> getClientList(@RequestParam String clientName) {
+    public List<Map<String, Object>> getClientList(
+            @RequestParam(defaultValue = "") String clientName) {
         List<Map<String, Object>> result = new ArrayList<>();
-        for (ClientEntity c : clientService.searchByName(clientName)) {
+        List<ClientEntity> clients = clientName.trim().isEmpty()
+                ? clientService.findAllActive()
+                : clientService.searchByName(clientName);
+        for (ClientEntity c : clients) {
             Map<String, Object> m = new HashMap<>();
-            m.put("clientId", c.getClientId());
-            m.put("clientName", c.getClientName());
-            m.put("mobile", c.getMobile());
-            m.put("city", c.getCity());
+            m.put("clientId",           c.getClientId());
+            m.put("clientName",         c.getClientName());
+            m.put("mobile",             c.getMobile());
+            m.put("emailId",            c.getEmailId());
+            m.put("city",               c.getCity());
+            m.put("country",            c.getCountry());
+            m.put("organizationName",   c.getOrganizationName());
+            m.put("organizationType",   c.getOrganizationType());
+            m.put("registrationNumber", c.getRegistrationNumber());
+            m.put("website",            c.getWebsite());
+            m.put("address",            c.getAddress());
+            m.put("postalCode",         c.getPostalCode());
+            m.put("designation",        c.getDesignation());
+            m.put("clientType",         c.getClientType());
+            m.put("clientSource",       c.getClientSource());
             result.add(m);
         }
         return result;

@@ -10,6 +10,7 @@ import java.util.List;
 @Repository
 public interface ClientRepository extends JpaRepository<ClientEntity, Long>, JpaSpecificationExecutor<ClientEntity> {
     List<ClientEntity> findByActiveTrue();
+    List<ClientEntity> findByClientNameContainingIgnoreCaseAndActiveTrue(String clientName);
     List<ClientEntity> findByClientNameContainingIgnoreCase(String clientName);
     boolean existsByMobile(String mobile);
     boolean existsByMobileAndClientIdNot(String mobile, Long clientId);

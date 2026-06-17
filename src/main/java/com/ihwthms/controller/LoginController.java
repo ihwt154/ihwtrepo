@@ -43,37 +43,47 @@ public class LoginController {
             return "redirect:/login";
         }
         
-        // Fetch dynamic counts from the database
+        // Fetch dynamic counts from the database using real status values
         long totalLeads = leadRepository.count();
-        long qualifiedLeads = leadRepository.countByLeadStatus("QUALIFIED");
-        long flaggedLeads = leadRepository.countByLeadStatus("CONTACTED");
         long totalClients = clientRepository.count();
         long totalUsers = userRepository.count();
-        
-        long newLeads = leadRepository.countByLeadStatus("NEW"); // Open
-        long contactedLeads = leadRepository.countByLeadStatus("CONTACTED"); // WIP
-        long lostLeads = leadRepository.countByLeadStatus("LOST"); // Failed-Closed
-        
-        // Calculate SVG chart coordinates dynamically
-        long sumForDonut = newLeads + contactedLeads + lostLeads;
-        double newPercent = sumForDonut > 0 ? (double) newLeads / sumForDonut * 100 : 0;
-        double contactedPercent = sumForDonut > 0 ? (double) contactedLeads / sumForDonut * 100 : 0;
-        double lostPercent = sumForDonut > 0 ? (double) lostLeads / sumForDonut * 100 : 0;
-        
-        model.addAttribute("totalLeads", totalLeads);
-        model.addAttribute("qualifiedLeads", qualifiedLeads);
-        model.addAttribute("flaggedLeads", flaggedLeads);
-        model.addAttribute("totalClients", totalClients);
-        model.addAttribute("totalUsers", totalUsers);
-        
-        model.addAttribute("newLeads", newLeads);
-        model.addAttribute("contactedLeads", contactedLeads);
-        model.addAttribute("lostLeads", lostLeads);
-        
-        model.addAttribute("newPercent", Math.round(newPercent));
-        model.addAttribute("contactedPercent", Math.round(contactedPercent));
-        model.addAttribute("lostPercent", Math.round(lostPercent));
-        
+
+        // Real status strings from WorkloadStatusService fallback
+        long openLeads       = leadRepository.countByLeadStatus("Open");
+        long wipLeads        = leadRepository.countByLeadStatus("Work In Progress");
+        long wonLeads        = leadRepository.countByLeadStatus("Won-Converted");
+        long failedLeads     = leadRepository.countByLeadStatus("Failed-Closed");
+
+        long sumForDonut = openLeads + wipLeads + wonLeads + failedLeads;
+        long openPercent   = sumForDonut > 0 ? Math.round((double) openLeads   / sumForDonut * 100) : 0;
+        long wipPercent    = sumForDonut > 0 ? Math.round((double) wipLeads    / sumForDonut * 100) : 0;
+        long wonPercent    = sumForDonut > 0 ? Math.round((double) wonLeads    / sumForDonut * 100) : 0;
+        long failedPercent = sumForDonut > 0 ? Math.round((double) failedLeads / sumForDonut * 100) : 0;
+
+        model.addAttribute("totalLeads",    totalLeads);
+        model.addAttribute("totalClients",  totalClients);
+        model.addAttribute("totalUsers",    totalUsers);
+
+        model.addAttribute("openLeads",    openLeads);
+        model.addAttribute("wipLeads",     wipLeads);
+        model.addAttribute("wonLeads",     wonLeads);
+        model.addAttribute("failedLeads",  failedLeads);
+
+        model.addAttribute("openPercent",   openPercent);
+        model.addAttribute("wipPercent",    wipPercent);
+        model.addAttribute("wonPercent",    wonPercent);
+        model.addAttribute("failedPercent", failedPercent);
+
+        // Legacy aliases used by old dashboard template
+        model.addAttribute("qualifiedLeads", wonLeads);
+        model.addAttribute("flaggedLeads",   wipLeads);
+        model.addAttribute("newLeads",       openLeads);
+        model.addAttribute("contactedLeads", wipLeads);
+        model.addAttribute("lostLeads",      failedLeads);
+        model.addAttribute("newPercent",     openPercent);
+        model.addAttribute("contactedPercent", wipPercent);
+        model.addAttribute("lostPercent",    failedPercent);
+
         return "dashboard";
     }
 }

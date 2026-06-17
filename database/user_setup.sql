@@ -12,6 +12,7 @@ CREATE TABLE IF NOT EXISTS users (
     first_name VARCHAR(50) NOT NULL,
     last_name VARCHAR(50) NOT NULL,
     is_active BOOLEAN NOT NULL DEFAULT TRUE,
+    roles VARCHAR(500) DEFAULT 'ROLE_ADMIN',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
@@ -35,6 +36,6 @@ CREATE TABLE IF NOT EXISTS leads (
 );
 
 -- 3. Seed default admin user (credentials: admin / admin123)
-INSERT INTO users (username, password, email, first_name, last_name, is_active)
-VALUES ('admin', 'admin123', 'admin@ihwthms.com', 'Admin', 'User', TRUE)
+INSERT INTO users (username, password, email, first_name, last_name, is_active, roles)
+VALUES ('admin', 'admin123', 'admin@ihwthms.com', 'Admin', 'User', TRUE, 'ROLE_ADMIN')
 ON DUPLICATE KEY UPDATE username=username;

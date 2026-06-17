@@ -5,7 +5,6 @@ import com.ihwthms.entity.Lead;
 public class LeadDTO {
 
     private Long leadId;
-    private String leadCode;
     private String leadTitle;
     private String leadName;
     private String email;
@@ -25,26 +24,41 @@ public class LeadDTO {
     private Long clientId;
     private String clientName;
 
+    // Organisation fields (auto-populated from linked client, stored in DB)
+    private String organizationName;
+    private String organizationType;
+    private String registrationNumber;
+    private String website;
+    private String address;
+    private String postalCode;
+    private String designation;
+
     public LeadDTO() {}
 
     public LeadDTO(Lead e) {
-        this.leadId = e.getId();
-        this.leadCode = e.getLeadCode();
-        this.leadTitle = e.getLeadTitle();
-        this.leadName = e.getLeadName();
-        this.email = e.getEmail();
-        this.mobileNumber = e.getMobileNumber();
-        this.city = e.getCity();
-        this.country = e.getCountry();
-        this.leadStatus = e.getLeadStatus();
-        this.leadSource = e.getLeadSource();
-        this.eventName = e.getEventName();
-        this.priority = e.getPriority();
-        this.assignedTo = e.getAssignedTo();
-        this.remarks = e.getRemarks();
-        this.isActive = e.getIsActive();
+        this.leadId          = e.getId();
+        this.leadTitle       = e.getLeadTitle();
+        this.leadName        = e.getLeadName();
+        this.email           = e.getEmail();
+        this.mobileNumber    = e.getMobileNumber();
+        this.city            = e.getCity();
+        this.country         = e.getCountry();
+        this.leadStatus      = e.getLeadStatus();
+        this.leadSource      = e.getLeadSource();
+        this.eventName       = e.getEventName();
+        this.priority        = e.getPriority();
+        this.assignedTo      = e.getAssignedTo();
+        this.remarks         = e.getRemarks();
+        this.isActive        = e.getIsActive();
+        this.organizationName     = e.getOrganizationName();
+        this.organizationType     = e.getOrganizationType();
+        this.registrationNumber   = e.getRegistrationNumber();
+        this.website              = e.getWebsite();
+        this.address              = e.getAddress();
+        this.postalCode           = e.getPostalCode();
+        this.designation          = e.getDesignation();
         if (e.getClient() != null) {
-            this.clientId = e.getClient().getClientId();
+            this.clientId   = e.getClient().getClientId();
             this.clientName = e.getClient().getClientName();
         }
     }
@@ -53,8 +67,8 @@ public class LeadDTO {
     public Long getLeadId() { return leadId; }
     public void setLeadId(Long leadId) { this.leadId = leadId; }
 
-    public String getLeadCode() { return leadCode; }
-    public void setLeadCode(String leadCode) { this.leadCode = leadCode; }
+    public String getLeadTitle() { return leadTitle; }
+    public void setLeadTitle(String leadTitle) { this.leadTitle = leadTitle; }
 
     public String getLeadName() { return leadName; }
     public void setLeadName(String leadName) { this.leadName = leadName; }
@@ -76,9 +90,6 @@ public class LeadDTO {
 
     public String getLeadSource() { return leadSource; }
     public void setLeadSource(String leadSource) { this.leadSource = leadSource; }
-
-    public String getLeadTitle() { return leadTitle; }
-    public void setLeadTitle(String leadTitle) { this.leadTitle = leadTitle; }
 
     public String getEventName() { return eventName; }
     public void setEventName(String eventName) { this.eventName = eventName; }
@@ -103,4 +114,25 @@ public class LeadDTO {
 
     public String getClientName() { return clientName; }
     public void setClientName(String clientName) { this.clientName = clientName; }
+
+    public String getOrganizationName() { return organizationName; }
+    public void setOrganizationName(String organizationName) { this.organizationName = organizationName; }
+
+    public String getOrganizationType() { return organizationType; }
+    public void setOrganizationType(String organizationType) { this.organizationType = organizationType; }
+
+    public String getRegistrationNumber() { return registrationNumber; }
+    public void setRegistrationNumber(String registrationNumber) { this.registrationNumber = registrationNumber; }
+
+    public String getWebsite() { return website; }
+    public void setWebsite(String website) { this.website = website; }
+
+    public String getAddress() { return address; }
+    public void setAddress(String address) { this.address = address; }
+
+    public String getPostalCode() { return postalCode; }
+    public void setPostalCode(String postalCode) { this.postalCode = postalCode; }
+
+    public String getDesignation() { return designation; }
+    public void setDesignation(String designation) { this.designation = designation; }
 }

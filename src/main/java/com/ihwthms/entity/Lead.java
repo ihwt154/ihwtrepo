@@ -16,9 +16,6 @@ public class Lead {
     @Column(name = "leadId")
     private Long id;
 
-    @Column(name = "leadCode", length = 50)
-    private String leadCode;
-
     @Column(name = "leadTitle", length = 200)
     private String leadTitle;
 
@@ -55,6 +52,29 @@ public class Lead {
     @Column(columnDefinition = "TEXT")
     private String remarks;
 
+    // ── Organisation fields (auto-populated from linked client) ──────────────
+    @Column(name = "organization_name", length = 200)
+    private String organizationName;
+
+    @Column(name = "organization_type", length = 100)
+    private String organizationType;
+
+    @Column(name = "registration_number", length = 100)
+    private String registrationNumber;
+
+    @Column(name = "website", length = 200)
+    private String website;
+
+    @Column(name = "address", columnDefinition = "TEXT")
+    private String address;
+
+    @Column(name = "postal_code", length = 20)
+    private String postalCode;
+
+    @Column(name = "designation", length = 100)
+    private String designation;
+    // ─────────────────────────────────────────────────────────────────────────
+
     @Column(name = "createdBy")
     private Long createdBy;
 
@@ -82,9 +102,6 @@ public class Lead {
     // Getters & Setters
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
-
-    public String getLeadCode() { return leadCode; }
-    public void setLeadCode(String leadCode) { this.leadCode = leadCode; }
 
     public String getLeadTitle() { return leadTitle; }
     public void setLeadTitle(String leadTitle) { this.leadTitle = leadTitle; }
@@ -121,6 +138,27 @@ public class Lead {
 
     public String getRemarks() { return remarks; }
     public void setRemarks(String remarks) { this.remarks = remarks; }
+
+    public String getOrganizationName() { return organizationName; }
+    public void setOrganizationName(String organizationName) { this.organizationName = organizationName; }
+
+    public String getOrganizationType() { return organizationType; }
+    public void setOrganizationType(String organizationType) { this.organizationType = organizationType; }
+
+    public String getRegistrationNumber() { return registrationNumber; }
+    public void setRegistrationNumber(String registrationNumber) { this.registrationNumber = registrationNumber; }
+
+    public String getWebsite() { return website; }
+    public void setWebsite(String website) { this.website = website; }
+
+    public String getAddress() { return address; }
+    public void setAddress(String address) { this.address = address; }
+
+    public String getPostalCode() { return postalCode; }
+    public void setPostalCode(String postalCode) { this.postalCode = postalCode; }
+
+    public String getDesignation() { return designation; }
+    public void setDesignation(String designation) { this.designation = designation; }
 
     public Long getCreatedBy() { return createdBy; }
     public void setCreatedBy(Long createdBy) { this.createdBy = createdBy; }

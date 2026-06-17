@@ -26,6 +26,80 @@
         .pagination a, .pagination span { padding: 8px 14px; border-radius: 8px; text-decoration: none; font-size: 0.85rem; }
         .pagination a { background: #f1f5f9; color: #475569; }
         .pagination .active { background: var(--accent-primary); color: #fff; }
+
+        /* Custom Multiselect Dropdown Styles */
+        .multiselect-dropdown {
+            position: relative;
+            width: 100%;
+        }
+        .multiselect-select-box {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            background: #ffffff;
+            cursor: pointer;
+            font-size: 0.9rem;
+            user-select: none;
+            height: 38px;
+        }
+        .multiselect-select-box span.arrow {
+            font-size: 0.7rem;
+            color: #64748b;
+            transition: transform 0.2s;
+        }
+        .multiselect-dropdown.open .multiselect-select-box span.arrow {
+            transform: rotate(180deg);
+        }
+        .multiselect-options-container {
+            display: none;
+            position: absolute;
+            top: 105%;
+            left: 0;
+            right: 0;
+            background: #ffffff;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            max-height: 250px;
+            overflow-y: auto;
+            z-index: 1000;
+            padding: 10px 0;
+        }
+        .multiselect-group-title {
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--accent-primary);
+            padding: 6px 14px 4px;
+            background: #f8fafc;
+        }
+        .multiselect-option {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 14px;
+            font-size: 0.85rem;
+            color: #334155;
+            cursor: pointer;
+            transition: background 0.15s;
+        }
+        .multiselect-option:hover {
+            background: #f1f5f9;
+        }
+        .multiselect-option.indent {
+            padding-left: 28px;
+        }
+        .multiselect-option input[type="checkbox"] {
+            cursor: pointer;
+            accent-color: var(--accent-primary);
+            width: 15px;
+            height: 15px;
+        }
     </style>
 </head>
 <body>
@@ -49,11 +123,38 @@
             </div>
             <div>
                 <label style="font-size:0.8rem;font-weight:600;color:#64748b;display:block;margin-bottom:4px;">Status</label>
-                <select name="leadStatus" style="width:100%;padding:8px;border:1px solid #e2e8f0;border-radius:8px;">
-                    <option value="">All Statuses</option>
-                    <option value="Open" ${f_leadStatus == 'Open' ? 'selected' : ''}>Open</option>
-                    <option value="Closed" ${f_leadStatus == 'Closed' ? 'selected' : ''}>Closed</option>
-                </select>
+                <div class="multiselect-dropdown" id="status-dropdown-wrapper">
+                    <div class="multiselect-select-box" onclick="toggleStatusDropdown(event)">
+                        <span id="multiselect-text">All Statuses</span>
+                        <span class="arrow">&#9662;</span>
+                    </div>
+                    <div class="multiselect-options-container" id="status-options">
+                        <div class="multiselect-group-title">Open Statuses</div>
+                        <label class="multiselect-option">
+                            <input type="checkbox" id="cb-status-open-group" name="leadStatus" value="OpenGroup" onchange="toggleGroupCheckboxes('Open', this.checked)" ${f_leadStatus.contains('OpenGroup') ? 'checked' : ''}> Open (Group)
+                        </label>
+                        <label class="multiselect-option indent">
+                            <input type="checkbox" class="status-child-checkbox" id="cb-status-open-ind" name="leadStatus" value="Open" data-label="Open" onchange="updateStatusUI()" ${f_leadStatus.contains('Open') ? 'checked' : ''}> Open
+                        </label>
+                        <label class="multiselect-option indent">
+                            <input type="checkbox" class="status-child-checkbox" id="cb-status-wip" name="leadStatus" value="Work In Progress" data-label="Work In Progress" onchange="updateStatusUI()" ${f_leadStatus.contains('Work In Progress') ? 'checked' : ''}> Work In Progress
+                        </label>
+
+                        <div class="multiselect-group-title">Closed Statuses</div>
+                        <label class="multiselect-option">
+                            <input type="checkbox" id="cb-status-closed-group" name="leadStatus" value="ClosedGroup" onchange="toggleGroupCheckboxes('Closed', this.checked)" ${f_leadStatus.contains('ClosedGroup') ? 'checked' : ''}> Closed (Group)
+                        </label>
+                        <label class="multiselect-option indent">
+                            <input type="checkbox" class="status-child-checkbox" id="cb-status-won" name="leadStatus" value="Won-Converted" data-label="Won-Converted" onchange="updateStatusUI()" ${f_leadStatus.contains('Won-Converted') ? 'checked' : ''}> Won-Converted
+                        </label>
+                        <label class="multiselect-option indent">
+                            <input type="checkbox" class="status-child-checkbox" id="cb-status-lost" name="leadStatus" value="Failed-Closed" data-label="Failed-Closed" onchange="updateStatusUI()" ${f_leadStatus.contains('Failed-Closed') ? 'checked' : ''}> Failed-Closed
+                        </label>
+                        <label class="multiselect-option indent">
+                            <input type="checkbox" class="status-child-checkbox" id="cb-status-dup" name="leadStatus" value="Duplicate" data-label="Duplicate" onchange="updateStatusUI()" ${f_leadStatus.contains('Duplicate') ? 'checked' : ''}> Duplicate
+                        </label>
+                    </div>
+                </div>
             </div>
             <div>
                 <label style="font-size:0.8rem;font-weight:600;color:#64748b;display:block;margin-bottom:4px;">Source</label>
@@ -94,9 +195,9 @@
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
         <p style="font-size:0.85rem;color:#64748b;margin:0;">Showing <strong>${LEADS_LIST.size()}</strong> of <strong>${totalLeads}</strong> leads</p>
         <div style="display:flex; gap:8px;">
-            <a href="${pageContext.request.contextPath}/leads/export/excel?leadStatus=${f_leadStatus}&leadSource=${f_leadSource}&clientName=${f_clientName}&assignedTo=${f_assignedTo}&priority=${f_priority}"
+            <a href="${pageContext.request.contextPath}/leads/export/excel?leadStatus=${f_leadStatusString}&leadSource=${f_leadSource}&clientName=${f_clientName}&assignedTo=${f_assignedTo}&priority=${f_priority}"
                style="padding:6px 12px;background:#10b981;color:#fff;border-radius:6px;text-decoration:none;font-size:0.8rem;font-weight:600;display:inline-flex;align-items:center;">Export Excel</a>
-            <a href="${pageContext.request.contextPath}/leads/export/pdf?leadStatus=${f_leadStatus}&leadSource=${f_leadSource}&clientName=${f_clientName}&assignedTo=${f_assignedTo}&priority=${f_priority}"
+            <a href="${pageContext.request.contextPath}/leads/export/pdf?leadStatus=${f_leadStatusString}&leadSource=${f_leadSource}&clientName=${f_clientName}&assignedTo=${f_assignedTo}&priority=${f_priority}"
                style="padding:6px 12px;background:#ef4444;color:#fff;border-radius:6px;text-decoration:none;font-size:0.8rem;font-weight:600;display:inline-flex;align-items:center;">Export PDF</a>
         </div>
     </div>
@@ -119,7 +220,7 @@
             </thead>
             <tbody>
                 <c:if test="${empty LEADS_LIST}">
-                    <tr><td colspan="9" style="text-align:center;padding:40px;color:#94a3b8;">No leads found. <a href="${pageContext.request.contextPath}/view_add_lead_form">Create your first lead â†’</a></td></tr>
+                    <tr><td colspan="9" style="text-align:center;padding:40px;color:#94a3b8;">No leads found. <a href="${pageContext.request.contextPath}/view_add_lead_form">Create your first lead &rarr;</a></td></tr>
                 </c:if>
                 <c:forEach var="lead" items="${LEADS_LIST}" varStatus="st">
                     <tr>
@@ -170,19 +271,115 @@
     <c:if test="${totalPages > 1}">
         <div class="pagination">
             <c:if test="${currentPage > 0}">
-                <a href="?page=${currentPage - 1}&pageSize=${pageSize}&leadStatus=${f_leadStatus}&leadSource=${f_leadSource}&clientName=${f_clientName}&priority=${f_priority}&assignedTo=${f_assignedTo}">← Prev</a>
+                <a href="?page=${currentPage - 1}&pageSize=${pageSize}&leadStatus=${f_leadStatusString}&leadSource=${f_leadSource}&clientName=${f_clientName}&priority=${f_priority}&assignedTo=${f_assignedTo}">← Prev</a>
             </c:if>
             <c:forEach begin="0" end="${totalPages - 1}" var="p">
                 <c:choose>
                     <c:when test="${p == currentPage}"><span class="active">${p + 1}</span></c:when>
-                    <c:otherwise><a href="?page=${p}&pageSize=${pageSize}&leadStatus=${f_leadStatus}&leadSource=${f_leadSource}&clientName=${f_clientName}&priority=${f_priority}&assignedTo=${f_assignedTo}">${p + 1}</a></c:otherwise>
+                    <c:otherwise><a href="?page=${p}&pageSize=${pageSize}&leadStatus=${f_leadStatusString}&leadSource=${f_leadSource}&clientName=${f_clientName}&priority=${f_priority}&assignedTo=${f_assignedTo}">${p + 1}</a></c:otherwise>
                 </c:choose>
             </c:forEach>
             <c:if test="${currentPage < totalPages - 1}">
-                <a href="?page=${currentPage + 1}&pageSize=${pageSize}&leadStatus=${f_leadStatus}&leadSource=${f_leadSource}&clientName=${f_clientName}&priority=${f_priority}&assignedTo=${f_assignedTo}">Next →</a>
+                <a href="?page=${currentPage + 1}&pageSize=${pageSize}&leadStatus=${f_leadStatusString}&leadSource=${f_leadSource}&clientName=${f_clientName}&priority=${f_priority}&assignedTo=${f_assignedTo}">Next →</a>
             </c:if>
         </div>
     </c:if>
 </div>
+
+<script>
+    // Toggle dropdown visibility
+    function toggleStatusDropdown(event) {
+        if (event) event.stopPropagation();
+        const dropdown = document.getElementById('status-dropdown-wrapper');
+        const container = document.getElementById('status-options');
+        dropdown.classList.toggle('open');
+        if (dropdown.classList.contains('open')) {
+            container.style.display = 'block';
+        } else {
+            container.style.display = 'none';
+        }
+    }
+
+    // Close dropdown when clicking outside
+    document.addEventListener('click', function(e) {
+        const wrapper = document.getElementById('status-dropdown-wrapper');
+        const container = document.getElementById('status-options');
+        if (wrapper && !wrapper.contains(e.target)) {
+            wrapper.classList.remove('open');
+            if (container) container.style.display = 'none';
+        }
+    });
+
+    // Update display text and sync checkboxes
+    function updateStatusUI() {
+        const openGroup = document.getElementById('cb-status-open-group');
+        const closedGroup = document.getElementById('cb-status-closed-group');
+        
+        const openChildren = [
+            document.getElementById('cb-status-open-ind'),
+            document.getElementById('cb-status-wip')
+        ];
+        
+        const closedChildren = [
+            document.getElementById('cb-status-won'),
+            document.getElementById('cb-status-lost'),
+            document.getElementById('cb-status-dup')
+        ];
+        
+        // Sync open group check state based on children
+        const allOpenChecked = openChildren.every(cb => cb.checked);
+        const anyOpenChecked = openChildren.some(cb => cb.checked);
+        openGroup.checked = allOpenChecked;
+        openGroup.indeterminate = anyOpenChecked && !allOpenChecked;
+        
+        // Sync closed group check state based on children
+        const allClosedChecked = closedChildren.every(cb => cb.checked);
+        const anyClosedChecked = closedChildren.some(cb => cb.checked);
+        closedGroup.checked = allClosedChecked;
+        closedGroup.indeterminate = anyClosedChecked && !allClosedChecked;
+
+        // Collect all checked values
+        const checkedBoxes = document.querySelectorAll('.status-child-checkbox:checked');
+        const textSpan = document.getElementById('multiselect-text');
+        
+        if (checkedBoxes.length === 0) {
+            textSpan.textContent = 'All Statuses';
+        } else if (checkedBoxes.length === openChildren.length + closedChildren.length) {
+            textSpan.textContent = 'All Statuses';
+        } else {
+            const labels = Array.from(checkedBoxes).map(cb => cb.getAttribute('data-label'));
+            textSpan.textContent = labels.join(', ');
+            if (textSpan.textContent.length > 20) {
+                textSpan.textContent = checkedBoxes.length + ' Selected';
+            }
+        }
+    }
+
+    // Handle Group Toggle click
+    function toggleGroupCheckboxes(groupType, checked) {
+        let targets = [];
+        if (groupType === 'Open') {
+            targets = [
+                document.getElementById('cb-status-open-ind'),
+                document.getElementById('cb-status-wip')
+            ];
+        } else if (groupType === 'Closed') {
+            targets = [
+                document.getElementById('cb-status-won'),
+                document.getElementById('cb-status-lost'),
+                document.getElementById('cb-status-dup')
+            ];
+        }
+        targets.forEach(cb => {
+            if (cb) cb.checked = checked;
+        });
+        updateStatusUI();
+    }
+
+    // Initialize UI on DOM load
+    document.addEventListener('DOMContentLoaded', function() {
+        updateStatusUI();
+    });
+</script>
 </body>
 </html>

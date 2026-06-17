@@ -13,8 +13,20 @@
         .source-table th { background:var(--accent-primary); color:#fff; padding:12px 16px; text-align:left; font-size:0.8rem; text-transform:uppercase; letter-spacing:.05em; }
         .source-table td { padding:12px 16px; border-bottom:1px solid #f1f5f9; font-size:0.9rem; }
         .source-table tr:hover td { background:#f8fafc; }
-        .badge-active { background:#d1fae5; color:#065f46; padding:3px 10px; border-radius:20px; font-size:0.75rem; font-weight:600; }
+        .badge-active   { background:#d1fae5; color:#065f46; padding:3px 10px; border-radius:20px; font-size:0.75rem; font-weight:600; }
         .badge-inactive { background:#fee2e2; color:#991b1b; padding:3px 10px; border-radius:20px; font-size:0.75rem; font-weight:600; }
+        .confirm-overlay { display:none; position:fixed; inset:0; background:rgba(15,23,42,0.55); backdrop-filter:blur(3px); z-index:2000; justify-content:center; align-items:center; }
+        .confirm-overlay.open { display:flex; }
+        .confirm-box { background:#fff; border-radius:16px; padding:32px 28px; width:380px; max-width:92%; box-shadow:0 20px 60px rgba(0,0,0,0.2); animation:popIn .2s ease; }
+        @keyframes popIn { from{transform:scale(.92);opacity:0} to{transform:scale(1);opacity:1} }
+        .confirm-icon  { font-size:2.2rem; text-align:center; margin-bottom:12px; }
+        .confirm-title { font-size:1.1rem; font-weight:700; color:#1e293b; text-align:center; margin-bottom:6px; }
+        .confirm-msg   { font-size:0.9rem; color:#64748b; text-align:center; margin-bottom:24px; line-height:1.5; }
+        .confirm-actions { display:flex; gap:10px; justify-content:center; }
+        .btn-cancel { padding:9px 22px; background:#f1f5f9; color:#475569; border:1px solid #e2e8f0; border-radius:8px; font-size:0.9rem; font-weight:600; cursor:pointer; }
+        .btn-ok     { padding:9px 22px; border:none; border-radius:8px; font-size:0.9rem; font-weight:600; cursor:pointer; }
+        .btn-danger  { background:#ef4444; color:#fff; }
+        .btn-success { background:#10b981; color:#fff; }
     </style>
 </head>
 <body>
@@ -52,13 +64,15 @@
                             <div style="display:flex;gap:6px;">
                                 <button onclick="openEditModal('${src.id}','${src.sourceName}')"
                                         style="padding:5px 12px;background:#dbeafe;color:#1d4ed8;border:1px solid #bfdbfe;border-radius:6px;cursor:pointer;font-size:0.78rem;font-weight:600;">Edit</button>
-                                <form method="post" action="${pageContext.request.contextPath}/admin/client/sources/toggle" style="display:inline;" onsubmit="return confirm('Toggle status?');">
+                                <form id="toggleForm_${src.id}" method="post"
+                                      action="${pageContext.request.contextPath}/admin/client/sources/toggle" style="display:none;">
                                     <input type="hidden" name="id" value="${src.id}">
-                                    <button type="submit"
-                                            style="padding:5px 12px;background:${src.active ? '#fee2e2' : '#d1fae5'};color:${src.active ? '#b91c1c' : '#065f46'};border:1px solid ${src.active ? '#fca5a5' : '#a7f3d0'};border-radius:6px;cursor:pointer;font-size:0.78rem;font-weight:600;">
-                                        ${src.active ? 'Deactivate' : 'Activate'}
-                                    </button>
                                 </form>
+                                <button type="button"
+                                        onclick="openConfirm('${src.id}','${src.sourceName}',${src.active})"
+                                        style="padding:5px 12px;background:${src.active ? '#fee2e2' : '#d1fae5'};color:${src.active ? '#b91c1c' : '#065f46'};border:1px solid ${src.active ? '#fca5a5' : '#a7f3d0'};border-radius:6px;cursor:pointer;font-size:0.78rem;font-weight:600;">
+                                    ${src.active ? 'Deactivate' : 'Activate'}
+                                </button>
                             </div>
                         </td>
                     </tr>
@@ -87,7 +101,38 @@
     </div>
 </div>
 
+<!-- Confirmation Modal -->
+<div id="confirmOverlay" class="confirm-overlay">
+    <div class="confirm-box">
+        <div class="confirm-icon"  id="confirmIcon">⚠️</div>
+        <div class="confirm-title" id="confirmTitle">Change Status?</div>
+        <div class="confirm-msg"   id="confirmMsg">Are you sure?</div>
+        <div class="confirm-actions">
+            <button class="btn-cancel" onclick="closeConfirm()">Cancel</button>
+            <button id="confirmOkBtn" class="btn-ok btn-danger" onclick="submitToggle()">Confirm</button>
+        </div>
+    </div>
+</div>
+
 <script>
+    var _pendingFormId = null;
+    function openConfirm(id, name, isActive) {
+        _pendingFormId = 'toggleForm_' + id;
+        document.getElementById('confirmIcon').textContent  = isActive ? '🔴' : '🟢';
+        document.getElementById('confirmTitle').textContent = isActive ? 'Deactivate Source?' : 'Activate Source?';
+        document.getElementById('confirmMsg').textContent   = '"' + name + '" will be ' + (isActive ? 'deactivated' : 'activated') + '.';
+        var btn = document.getElementById('confirmOkBtn');
+        btn.textContent = isActive ? 'Yes, Deactivate' : 'Yes, Activate';
+        btn.className   = 'btn-ok ' + (isActive ? 'btn-danger' : 'btn-success');
+        document.getElementById('confirmOverlay').classList.add('open');
+    }
+    function closeConfirm() {
+        document.getElementById('confirmOverlay').classList.remove('open');
+        _pendingFormId = null;
+    }
+    function submitToggle() { if (_pendingFormId) document.getElementById(_pendingFormId).submit(); }
+    document.getElementById('confirmOverlay').addEventListener('click', function(e) { if(e.target===this) closeConfirm(); });
+
     function openModal() {
         document.getElementById('modalTitle').textContent = 'Add Client Source';
         document.getElementById('sourceId').value = '';
@@ -100,12 +145,8 @@
         document.getElementById('sourceNameInput').value = name;
         document.getElementById('sourceModal').style.display = 'flex';
     }
-    function closeModal() {
-        document.getElementById('sourceModal').style.display = 'none';
-    }
-    document.getElementById('sourceModal').addEventListener('click', function(e) {
-        if (e.target === this) closeModal();
-    });
+    function closeModal() { document.getElementById('sourceModal').style.display = 'none'; }
+    document.getElementById('sourceModal').addEventListener('click', function(e) { if(e.target===this) closeModal(); });
 </script>
 </body>
 </html>

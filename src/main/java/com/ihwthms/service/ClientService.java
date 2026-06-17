@@ -33,7 +33,7 @@ public class ClientService {
     }
 
     public List<ClientEntity> searchByName(String name) {
-        return clientRepository.findByClientNameContainingIgnoreCase(name);
+        return clientRepository.findByClientNameContainingIgnoreCaseAndActiveTrue(name);
     }
 
     public boolean isMobileExists(String mobile) {

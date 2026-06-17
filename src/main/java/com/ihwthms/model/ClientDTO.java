@@ -5,7 +5,6 @@ import com.ihwthms.entity.ClientEntity;
 public class ClientDTO {
 
     private Long clientId;
-    private String clientCode;
     private String clientName;
     private String mobile;
     private String emailId;
@@ -29,7 +28,6 @@ public class ClientDTO {
 
     public ClientDTO(ClientEntity e) {
         this.clientId = e.getClientId();
-        this.clientCode = e.getClientCode();
         this.clientName = e.getClientName();
         this.mobile = e.getMobile();
         this.emailId = e.getEmailId();
@@ -53,9 +51,6 @@ public class ClientDTO {
     // Getters & Setters
     public Long getClientId() { return clientId; }
     public void setClientId(Long clientId) { this.clientId = clientId; }
-
-    public String getClientCode() { return clientCode; }
-    public void setClientCode(String clientCode) { this.clientCode = clientCode; }
 
     public String getClientName() { return clientName; }
     public void setClientName(String clientName) { this.clientName = clientName; }

@@ -59,12 +59,16 @@
 <nav class="gs-nav">
     <ul class="gs-nav-list">
         <%-- Lead Management --%>
-        <sec:authorize access="hasAnyRole('ADMIN','LEADS_MANAGE')">
+        <sec:authorize access="hasAnyRole('ADMIN','LEADS_MANAGE','LEADS_CREATE')">
             <li class="gs-nav-item">
                 <a href="#" class="gs-nav-link">Lead Management</a>
                 <ul class="gs-dropdown">
-                    <li><a href="${pageContext.request.contextPath}/view_add_lead_form" class="gs-dropdown-item">Add New Lead</a></li>
-                    <li><a href="${pageContext.request.contextPath}/view_filter_leads" class="gs-dropdown-item">Manage Leads</a></li>
+                    <sec:authorize access="hasAnyRole('ADMIN','LEADS_CREATE')">
+                        <li><a href="${pageContext.request.contextPath}/view_add_lead_form" class="gs-dropdown-item">Add New Lead</a></li>
+                    </sec:authorize>
+                    <sec:authorize access="hasAnyRole('ADMIN','LEADS_MANAGE')">
+                        <li><a href="${pageContext.request.contextPath}/view_filter_leads" class="gs-dropdown-item">Manage Leads</a></li>
+                    </sec:authorize>
                 </ul>
             </li>
         </sec:authorize>
@@ -85,10 +89,14 @@
             <li class="gs-nav-item">
                 <a href="#" class="gs-nav-link">Client Management</a>
                 <ul class="gs-dropdown">
-                    <li><a href="${pageContext.request.contextPath}/view_add_client_form" class="gs-dropdown-item">Add Client</a></li>
-                    <li><a href="${pageContext.request.contextPath}/view_clients_list" class="gs-dropdown-item">Manage Clients</a></li>
-                    <li><a href="${pageContext.request.contextPath}/admin/client/sources" class="gs-dropdown-item">Client Source</a></li>
-                    <li><a href="${pageContext.request.contextPath}/admin/client/types" class="gs-dropdown-item">Client Type</a></li>
+                    <sec:authorize access="hasAnyRole('ADMIN','CLIENT_CREATE')">
+                        <li><a href="${pageContext.request.contextPath}/view_add_client_form" class="gs-dropdown-item">Add Client</a></li>
+                    </sec:authorize>
+                    <sec:authorize access="hasAnyRole('ADMIN','CLIENT_MANAGE')">
+                        <li><a href="${pageContext.request.contextPath}/view_clients_list" class="gs-dropdown-item">Manage Clients</a></li>
+                        <li><a href="${pageContext.request.contextPath}/admin/client/sources" class="gs-dropdown-item">Client Source</a></li>
+                        <li><a href="${pageContext.request.contextPath}/admin/client/types" class="gs-dropdown-item">Client Type</a></li>
+                    </sec:authorize>
                 </ul>
             </li>
         </sec:authorize>
@@ -100,7 +108,7 @@
 
         <%-- Settings --%>
         <li class="gs-nav-item gs-nav-settings">
-            <a href="${pageContext.request.contextPath}/view_form_manage_central_config" class="gs-nav-link" title="Settings">&#9881;</a>
+            <a href="${pageContext.request.contextPath}/settings/profile" class="gs-nav-link" title="Settings">&#9881;</a>
         </li>
     </ul>
 </nav>
