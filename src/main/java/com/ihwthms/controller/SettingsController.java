@@ -55,12 +55,7 @@ public class SettingsController {
 
         try {
             if (logoFile != null && !logoFile.isEmpty()) {
-                String uploadDir = request.getServletContext().getRealPath("/resources/images/");
-                File dir = new File(uploadDir);
-                if (!dir.exists()) dir.mkdirs();
-                Path filePath = Paths.get(uploadDir, "logo.png");
-                logoFile.transferTo(filePath.toFile());
-                dto.setLogoPath("/resources/images/logo.png");
+                dto.setLogoPath("/logo.png");
             }
             centralConfigService.saveOrUpdateCentralConfig(dto);
             redirectAttrib.addFlashAttribute("success", "Configuration saved successfully!");
@@ -69,6 +64,24 @@ public class SettingsController {
             redirectAttrib.addFlashAttribute("error", "Failed to save configuration. Please try again.");
         }
         return "redirect:/settings/profile?tab=config";
+    }
+
+    // ===== SERVE LOGO FROM DATABASE =====
+    @GetMapping("/logo.png")
+    @ResponseBody
+    public org.springframework.http.ResponseEntity<byte[]> showLogo() {
+        com.ihwthms.entity.CentralConfigEntity entity = centralConfigService.getRawCentralConfig();
+        if (entity != null && entity.getLogoData() != null) {
+            org.springframework.http.HttpHeaders headers = new org.springframework.http.HttpHeaders();
+            String contentType = entity.getLogoContentType();
+            if (contentType == null || contentType.isEmpty()) {
+                contentType = "image/png";
+            }
+            headers.setContentType(org.springframework.http.MediaType.parseMediaType(contentType));
+            headers.setCacheControl("max-age=86400"); // Cache for 1 day
+            return new org.springframework.http.ResponseEntity<>(entity.getLogoData(), headers, org.springframework.http.HttpStatus.OK);
+        }
+        return new org.springframework.http.ResponseEntity<>(org.springframework.http.HttpStatus.NOT_FOUND);
     }
 
     // ===== SETTINGS HUB: My Profile / Change Password / Permissions =====

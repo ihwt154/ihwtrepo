@@ -82,6 +82,13 @@ public class CentralConfigEntity {
     @Column(name = "logo_path")
     private String logoPath;
 
+    @Lob
+    @Column(name = "logo_data", columnDefinition = "LONGBLOB")
+    private byte[] logoData;
+
+    @Column(name = "logo_content_type")
+    private String logoContentType;
+
     // Quotation Config
     @Column(name = "quotationTopCover", columnDefinition = "TEXT")
     private String quotationTopCover;
@@ -215,6 +222,12 @@ public class CentralConfigEntity {
 
     public String getLogoPath() { return logoPath; }
     public void setLogoPath(String logoPath) { this.logoPath = logoPath; }
+
+    public byte[] getLogoData() { return logoData; }
+    public void setLogoData(byte[] logoData) { this.logoData = logoData; }
+
+    public String getLogoContentType() { return logoContentType; }
+    public void setLogoContentType(String logoContentType) { this.logoContentType = logoContentType; }
 
     public String getQuotationTopCover() { return quotationTopCover; }
     public void setQuotationTopCover(String quotationTopCover) { this.quotationTopCover = quotationTopCover; }

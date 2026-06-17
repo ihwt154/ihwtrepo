@@ -21,6 +21,10 @@ public class CentralConfigService {
                 .orElse(new CentralConfigEntityDTO());
     }
 
+    public CentralConfigEntity getRawCentralConfig() {
+        return centralConfigRepository.findTopByOrderByIdAsc();
+    }
+
     // ===== SAVE / UPDATE =====
     public void saveOrUpdateCentralConfig(CentralConfigEntityDTO dto) {
         CentralConfigEntity entity = Optional.ofNullable(centralConfigRepository.findTopByOrderByIdAsc())
@@ -51,7 +55,15 @@ public class CentralConfigService {
         entity.setYoutubeLink(dto.getYoutubeLink());
         entity.setxLink(dto.getxLink());
 
-        if (dto.getLogoPath() != null && !dto.getLogoPath().isEmpty()) {
+        if (dto.getLogoFile() != null && !dto.getLogoFile().isEmpty()) {
+            try {
+                entity.setLogoData(dto.getLogoFile().getBytes());
+                entity.setLogoContentType(dto.getLogoFile().getContentType());
+                entity.setLogoPath("/logo.png");
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        } else if (dto.getLogoPath() != null && !dto.getLogoPath().isEmpty()) {
             entity.setLogoPath(dto.getLogoPath());
         }
 
