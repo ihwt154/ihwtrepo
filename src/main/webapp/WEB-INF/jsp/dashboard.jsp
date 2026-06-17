@@ -1,11 +1,12 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>IHWT CRM - Federation Dashboard</title>
+    <title><c:choose><c:when test="${not empty centralConfig.companyName}">${centralConfig.companyName}</c:when><c:otherwise>CRM</c:otherwise></c:choose> - Dashboard</title>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/style.css">
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
@@ -18,10 +19,10 @@
         <section class="bento-card welcome-bento">
             <div class="banner-left">
                 <h2>Welcome, <c:out value="${pageContext.request.userPrincipal.name}" default="Admin"/></h2>
-                <p>IHWT Federation - Dashboard</p>
+                <p><c:choose><c:when test="${not empty centralConfig.companyName}">${centralConfig.companyName}</c:when><c:otherwise>CRM</c:otherwise></c:choose> - Dashboard</p>
             </div>
             <div class="banner-right">
-                <h3>IHWT Federation</h3>
+                <h3><c:choose><c:when test="${not empty centralConfig.companyName}">${centralConfig.companyName}</c:when><c:otherwise>CRM</c:otherwise></c:choose></h3>
                 <span>★ ADMINISTRATOR VIEW</span>
             </div>
         </section>

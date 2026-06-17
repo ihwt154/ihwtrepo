@@ -10,6 +10,7 @@ public class LeadDTO {
     private String email;
     private String mobileNumber;
     private String city;
+    private Long cityId;
     private String country;
     private String leadStatus;
     private String leadSource;
@@ -41,7 +42,10 @@ public class LeadDTO {
         this.leadName        = e.getLeadName();
         this.email           = e.getEmail();
         this.mobileNumber    = e.getMobileNumber();
-        this.city            = e.getCity();
+        if (e.getCity() != null) {
+            this.city = e.getCity().getName();
+            this.cityId = e.getCity().getId();
+        }
         this.country         = e.getCountry();
         this.leadStatus      = e.getLeadStatus();
         this.leadSource      = e.getLeadSource();
@@ -135,4 +139,16 @@ public class LeadDTO {
 
     public String getDesignation() { return designation; }
     public void setDesignation(String designation) { this.designation = designation; }
+
+    public Long getCityId() { return cityId; }
+    public void setCityId(Long cityId) { this.cityId = cityId; }
+
+    private Boolean notifyEmail = false;
+    private Boolean notifyWhatsApp = false;
+
+    public Boolean getNotifyEmail() { return notifyEmail; }
+    public void setNotifyEmail(Boolean notifyEmail) { this.notifyEmail = notifyEmail; }
+
+    public Boolean getNotifyWhatsApp() { return notifyWhatsApp; }
+    public void setNotifyWhatsApp(Boolean notifyWhatsApp) { this.notifyWhatsApp = notifyWhatsApp; }
 }

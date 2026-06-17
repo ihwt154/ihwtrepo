@@ -591,17 +591,21 @@
                                 <button class="sidebar-item active" id="tab-profile-btn" onclick="showTab('profile')">
                                     <span class="si-icon">👤</span> My Profile
                                 </button>
-                                <button class="sidebar-item" id="tab-config-btn" onclick="showTab('config')">
-                                    <span class="si-icon">⚙️</span> Central Config
-                                </button>
+                                <c:if test="${CURRENT_USER.hasRole('ADMIN') || CURRENT_USER.hasRole('SUPERADMIN')}">
+                                    <button class="sidebar-item" id="tab-config-btn" onclick="showTab('config')">
+                                        <span class="si-icon">⚙️</span> Central Config
+                                    </button>
+                                </c:if>
                                 <button class="sidebar-item" id="tab-password-btn" onclick="showTab('password')">
                                     <span class="si-icon">🔑</span> Change Password
                                 </button>
 
-                                <div class="sidebar-section-label" style="margin-top:12px;">Administration</div>
-                                <button class="sidebar-item" id="tab-permissions-btn" onclick="showTab('permissions')">
-                                    <span class="si-icon">🛡️</span> Permissions
-                                </button>
+                                <c:if test="${CURRENT_USER.hasRole('ADMIN') || CURRENT_USER.hasRole('SUPERADMIN')}">
+                                    <div class="sidebar-section-label" style="margin-top:12px;">Administration</div>
+                                    <button class="sidebar-item" id="tab-permissions-btn" onclick="showTab('permissions')">
+                                        <span class="si-icon">🛡️</span> Permissions
+                                    </button>
+                                </c:if>
                             </aside>
 
                             <!-- ── Content Panels ──────────────────────────────────────── -->
@@ -794,6 +798,7 @@
                                                 </div>
                                     </div>
 
+                                    <c:if test="${CURRENT_USER.hasRole('ADMIN') || CURRENT_USER.hasRole('SUPERADMIN')}">
                                     <%-- ── CENTRAL CONFIG PANEL ───────────────────────── --%>
                                         <div id="tab-config" class="tab-panel">
 
@@ -1074,6 +1079,7 @@
                                                                             </div>
                                             </form:form>
                                         </div>
+                                    </c:if>
 
                                         <%-- ── CHANGE PASSWORD PANEL ─────────────────────── --%>
                                             <div id="tab-password" class="tab-panel">
@@ -1125,6 +1131,7 @@
                                                 </div>
                                             </div>
 
+                                            <c:if test="${CURRENT_USER.hasRole('ADMIN') || CURRENT_USER.hasRole('SUPERADMIN')}">
                                             <%-- ── PERMISSIONS PANEL ─────────────────────────── --%>
                                                 <div id="tab-permissions" class="tab-panel">
 
@@ -1144,7 +1151,6 @@
                                                                     <tr>
                                                                         <th>User</th>
                                                                         <th>Email</th>
-                                                                        <th>System Role</th>
                                                                         <th>Lead Access</th>
                                                                         <th>Client Access</th>
                                                                         <th>User Mgmt</th>
@@ -1163,19 +1169,7 @@
                                                                                     @${u.username}</div>
                                                                             </td>
                                                                             <td style="font-size:13px;">${u.email}</td>
-                                                                            <td>
-                                                                                <c:choose>
-                                                                                    <c:when
-                                                                                        test="${u.hasRole('ROLE_ADMIN')}">
-                                                                                        <span
-                                                                                            style="background:#ede9fe;color:#6366f1;padding:3px 8px;border-radius:6px;font-size:11px;font-weight:700;letter-spacing:0.04em;">ADMIN</span>
-                                                                                    </c:when>
-                                                                                    <c:otherwise>
-                                                                                        <span
-                                                                                            style="background:#f1f5f9;color:#475569;padding:3px 8px;border-radius:6px;font-size:11px;font-weight:700;letter-spacing:0.04em;">USER</span>
-                                                                                    </c:otherwise>
-                                                                                </c:choose>
-                                                                            </td>
+
                                                                             <td>
                                                                                 <c:choose>
                                                                                     <c:when
@@ -1274,38 +1268,6 @@
                                     method="post" id="permForm">
                                     <input type="hidden" name="userId" id="permUserId">
 
-                                    <div class="perm-group-title">🔑 System Roles</div>
-                                    <div class="perm-check-row">
-                                        <div>
-                                            <div class="perm-check-label">Super Administrator</div>
-                                            <div class="perm-check-desc">Absolute bypass access (details & permissions locked)</div>
-                                        </div>
-                                        <label class="switch">
-                                            <input type="checkbox" name="roles" value="SUPERADMIN" id="perm_SUPERADMIN">
-                                            <span class="slider"></span>
-                                        </label>
-                                    </div>
-                                    <div class="perm-check-row">
-                                        <div>
-                                            <div class="perm-check-label">Administrator</div>
-                                            <div class="perm-check-desc">Full access to all CRM settings and config
-                                            </div>
-                                        </div>
-                                        <label class="switch">
-                                            <input type="checkbox" name="roles" value="ROLE_ADMIN" id="perm_ROLE_ADMIN">
-                                            <span class="slider"></span>
-                                        </label>
-                                    </div>
-                                    <div class="perm-check-row">
-                                        <div>
-                                            <div class="perm-check-label">Standard User</div>
-                                            <div class="perm-check-desc">Standard access base permission</div>
-                                        </div>
-                                        <label class="switch">
-                                            <input type="checkbox" name="roles" value="ROLE_USER" id="perm_ROLE_USER">
-                                            <span class="slider"></span>
-                                        </label>
-                                    </div>
 
                                     <div class="perm-group-title">🗂️ Lead Management</div>
                                     <div class="perm-check-row">
@@ -1376,6 +1338,7 @@
                                     </div>
                                 </form>
                             </div>
+                        </c:if>
                         </div>
 
                         <script>
@@ -1449,7 +1412,7 @@
                             }
 
                             /* ── Permissions modal ───────────────────────────────── */
-                            var ALL_PERM_KEYS = ['SUPERADMIN', 'ROLE_ADMIN', 'ROLE_USER', 'LEADS_CREATE', 'LEADS_MANAGE', 'CLIENT_CREATE', 'CLIENT_MANAGE', 'USER_MANAGE'];
+                            var ALL_PERM_KEYS = ['LEADS_CREATE', 'LEADS_MANAGE', 'CLIENT_CREATE', 'CLIENT_MANAGE', 'USER_MANAGE'];
 
                             function openPermModal(userId, username, fullName, rolesStr) {
                                 document.getElementById('permUserId').value = userId;

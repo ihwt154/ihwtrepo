@@ -178,6 +178,19 @@
                 </div>
             </div>
 
+            <%-- ── NOTIFICATION CONTROLS ────────────────────────────────────── --%>
+            <div class="section-title" style="margin-top:24px;">Notification Settings</div>
+            <div style="display:flex; gap:24px; margin-bottom:24px; background: rgba(99,102,241,0.03); border: 1px solid #e2e8f0; border-radius: 12px; padding: 16px 20px;">
+                <label style="display:flex; align-items:center; gap:8px; font-size:0.9rem; font-weight:600; color:#475569; cursor:pointer;">
+                    <input type="checkbox" name="notifyEmail" id="notifyEmail" style="width:18px; height:18px; cursor:pointer;">
+                    Notify Client via Email
+                </label>
+                <label style="display:flex; align-items:center; gap:8px; font-size:0.9rem; font-weight:600; color:#475569; cursor:pointer;">
+                    <input type="checkbox" name="notifyWhatsApp" id="notifyWhatsApp" style="width:18px; height:18px; cursor:pointer;">
+                    Notify Client via WhatsApp
+                </label>
+            </div>
+
             <%-- ── ACTIONS ───────────────────────────────────────────────────── --%>
             <div style="display:flex; gap:12px; justify-content:flex-end; margin-top:8px;">
                 <a href="${pageContext.request.contextPath}/view_filter_leads"

@@ -142,7 +142,9 @@ public class LeadController {
 
         // Persist and notify
         leadService.saveLead(lead);
-        notificationService.sendLeadRegistrationNotifications(lead);
+        boolean notifyEmail = Boolean.TRUE.equals(dto.getNotifyEmail());
+        boolean notifyWhatsApp = Boolean.TRUE.equals(dto.getNotifyWhatsApp());
+        notificationService.sendLeadRegistrationNotifications(lead, notifyEmail, notifyWhatsApp);
         ra.addFlashAttribute("success", "Lead created successfully!");
         return "redirect:/view_filter_leads";
     }
@@ -336,7 +338,7 @@ public class LeadController {
             row.createCell(2).setCellValue(lead.getLeadName() != null ? lead.getLeadName() : "");
             row.createCell(3).setCellValue(lead.getClient() != null ? lead.getClient().getClientName() : "");
             row.createCell(4).setCellValue(lead.getMobileNumber() != null ? lead.getMobileNumber() : "");
-            row.createCell(5).setCellValue(lead.getCity() != null ? lead.getCity() : "");
+            row.createCell(5).setCellValue(lead.getCity() != null ? lead.getCity().getName() : "");
             row.createCell(6).setCellValue(lead.getLeadStatus() != null ? lead.getLeadStatus() : "");
             row.createCell(7).setCellValue(lead.getLeadSource() != null ? lead.getLeadSource() : "");
             row.createCell(8).setCellValue(lead.getEventName() != null ? lead.getEventName() : "");
@@ -406,7 +408,7 @@ public class LeadController {
             table.addCell(new PdfPCell(new Phrase(lead.getLeadName() != null ? lead.getLeadName() : "", dataFont)));
             table.addCell(new PdfPCell(new Phrase(lead.getClient() != null ? lead.getClient().getClientName() : "", dataFont)));
             table.addCell(new PdfPCell(new Phrase(lead.getMobileNumber() != null ? lead.getMobileNumber() : "", dataFont)));
-            table.addCell(new PdfPCell(new Phrase(lead.getCity() != null ? lead.getCity() : "", dataFont)));
+            table.addCell(new PdfPCell(new Phrase(lead.getCity() != null ? lead.getCity().getName() : "", dataFont)));
             table.addCell(new PdfPCell(new Phrase(lead.getLeadStatus() != null ? lead.getLeadStatus() : "", dataFont)));
             table.addCell(new PdfPCell(new Phrase(lead.getLeadSource() != null ? lead.getLeadSource() : "", dataFont)));
             table.addCell(new PdfPCell(new Phrase(lead.getEventName() != null ? lead.getEventName() : "", dataFont)));
@@ -437,7 +439,7 @@ public class LeadController {
             m.put("clientName",         c.getClientName());
             m.put("mobile",             c.getMobile());
             m.put("emailId",            c.getEmailId());
-            m.put("city",               c.getCity());
+            m.put("city",               c.getCity() != null ? c.getCity().getName() : "");
             m.put("country",            c.getCountry());
             m.put("organizationName",   c.getOrganizationName());
             m.put("organizationType",   c.getOrganizationType());

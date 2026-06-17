@@ -3,6 +3,7 @@ package com.ihwthms.controller;
 import com.ihwthms.entity.ClientEntity;
 import com.ihwthms.entity.User;
 import com.ihwthms.model.ClientDTO;
+import com.ihwthms.repository.CityRepository;
 import com.ihwthms.repository.UserRepository;
 import com.ihwthms.service.ClientService;
 import com.ihwthms.service.ClientSourceService;
@@ -43,6 +44,7 @@ public class ClientController {
     @Autowired private UserRepository userRepository;
     @Autowired private ClientSourceService clientSourceService;
     @Autowired private ClientTypeService clientTypeService;
+    @Autowired private CityRepository cityRepository;
 
     private static final List<String> CLIENT_STATUSES = Arrays.asList(
             "Active", "Inactive");
@@ -60,6 +62,7 @@ public class ClientController {
         mv.addObject("CLIENT_STATUSES", CLIENT_STATUSES);
         mv.addObject("CLIENT_SOURCES", clientSourceService.findAllActive());
         mv.addObject("CLIENT_TYPES", clientTypeService.findAllActive());
+        mv.addObject("CITIES", cityRepository.findAll());
         return mv;
     }
 
@@ -107,6 +110,7 @@ public class ClientController {
         mv.addObject("f_active", active);
         mv.addObject("f_city", city);
         mv.addObject("CLIENT_STATUSES", CLIENT_STATUSES);
+        mv.addObject("CITIES", cityRepository.findAll());
         return mv;
     }
 
@@ -128,6 +132,7 @@ public class ClientController {
         mv.addObject("CLIENT_STATUSES", CLIENT_STATUSES);
         mv.addObject("CLIENT_SOURCES", clientSourceService.findAllActive());
         mv.addObject("CLIENT_TYPES", clientTypeService.findAllActive());
+        mv.addObject("CITIES", cityRepository.findAll());
         return mv;
     }
 
@@ -198,7 +203,7 @@ public class ClientController {
             row.createCell(1).setCellValue(client.getClientName() != null ? client.getClientName() : "");
             row.createCell(2).setCellValue(client.getMobile() != null ? client.getMobile() : "");
             row.createCell(3).setCellValue(client.getEmailId() != null ? client.getEmailId() : "");
-            row.createCell(4).setCellValue(client.getCity() != null ? client.getCity() : "");
+            row.createCell(4).setCellValue(client.getCity() != null ? client.getCity().getName() : "");
             row.createCell(5).setCellValue(client.getCountry() != null ? client.getCountry() : "");
             row.createCell(6).setCellValue(client.getClientSource() != null ? client.getClientSource() : "");
             row.createCell(7).setCellValue(client.getClientType() != null ? client.getClientType() : "");
@@ -264,7 +269,7 @@ public class ClientController {
             table.addCell(new PdfPCell(new Phrase(client.getClientName() != null ? client.getClientName() : "", dataFont)));
             table.addCell(new PdfPCell(new Phrase(client.getMobile() != null ? client.getMobile() : "", dataFont)));
             table.addCell(new PdfPCell(new Phrase(client.getEmailId() != null ? client.getEmailId() : "", dataFont)));
-            table.addCell(new PdfPCell(new Phrase(client.getCity() != null ? client.getCity() : "", dataFont)));
+            table.addCell(new PdfPCell(new Phrase(client.getCity() != null ? client.getCity().getName() : "", dataFont)));
             table.addCell(new PdfPCell(new Phrase(client.getCountry() != null ? client.getCountry() : "", dataFont)));
             table.addCell(new PdfPCell(new Phrase(client.getClientSource() != null ? client.getClientSource() : "", dataFont)));
             table.addCell(new PdfPCell(new Phrase(client.getClientType() != null ? client.getClientType() : "", dataFont)));
@@ -281,7 +286,11 @@ public class ClientController {
         entity.setClientName(dto.getClientName());
         entity.setMobile(dto.getMobile());
         entity.setEmailId(dto.getEmailId());
-        entity.setCity(dto.getCity());
+        if (dto.getCityId() != null) {
+            entity.setCity(cityRepository.findById(dto.getCityId()).orElse(null));
+        } else {
+            entity.setCity(null);
+        }
         entity.setCountry(dto.getCountry());
         entity.setClientStatus(dto.getClientStatus() != null ? dto.getClientStatus() : "Active");
         entity.setClientSource(dto.getClientSource());

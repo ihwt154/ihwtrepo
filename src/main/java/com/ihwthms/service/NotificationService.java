@@ -22,16 +22,20 @@ public class NotificationService {
     @Autowired
     private CentralConfigEntityRepository centralConfigRepository;
 
-    public void sendLeadRegistrationNotifications(Lead lead) {
+    public void sendLeadRegistrationNotifications(Lead lead, boolean notifyEmail, boolean notifyWhatsApp) {
         new Thread(() -> {
             try {
-                sendEmailNotifications(lead);
+                sendEmailNotifications(lead, notifyEmail);
             } catch (Exception e) {
                 System.err.println("Failed to send lead registration email: " + e.getMessage());
                 e.printStackTrace();
             }
             try {
-                sendWhatsAppNotification(lead);
+                if (notifyWhatsApp) {
+                    sendWhatsAppNotification(lead);
+                } else {
+                    System.out.println("WhatsApp notification not checked. Skipping WhatsApp notification.");
+                }
             } catch (Exception e) {
                 System.err.println("Failed to send lead registration WhatsApp: " + e.getMessage());
                 e.printStackTrace();
@@ -39,7 +43,7 @@ public class NotificationService {
         }).start();
     }
 
-    private void sendEmailNotifications(Lead lead) {
+    private void sendEmailNotifications(Lead lead, boolean notifyEmail) {
         CentralConfigEntity config = centralConfigRepository.findTopByOrderByIdAsc();
         if (config == null) return;
 
@@ -80,7 +84,7 @@ public class NotificationService {
         props.put("mail.smtp.ssl.trust", host);
 
         // 1. Client Email Notification
-        if (clientActive && lead.getEmail() != null && !lead.getEmail().trim().isEmpty()) {
+        if (notifyEmail && clientActive && lead.getEmail() != null && !lead.getEmail().trim().isEmpty()) {
             try {
                 MimeMessage message = mailSender.createMimeMessage();
                 MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");

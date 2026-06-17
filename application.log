@@ -2140,3 +2140,143 @@ javax.servlet.ServletException: File [&#47;WEB-INF&#47;jsp&#47;error.jsp] not fo
 2026-06-17 17:51:43.973  INFO 21832 --- [http-nio-8083-exec-1] o.a.c.c.C.[Tomcat].[localhost].[/ihwt]   : Initializing Spring DispatcherServlet 'dispatcherServlet'
 2026-06-17 17:51:43.973  INFO 21832 --- [http-nio-8083-exec-1] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
 2026-06-17 17:51:44.001  INFO 21832 --- [http-nio-8083-exec-1] o.s.web.servlet.DispatcherServlet        : Completed initialization in 27 ms
+2026-06-17 18:20:41.791  INFO 21832 --- [SpringContextShutdownHook] o.s.s.c.ThreadPoolTaskScheduler          : Shutting down ExecutorService 'taskScheduler'
+2026-06-17 18:20:41.811  INFO 21832 --- [SpringContextShutdownHook] o.s.s.concurrent.ThreadPoolTaskExecutor  : Shutting down ExecutorService 'applicationTaskExecutor'
+2026-06-17 18:20:41.828  INFO 21832 --- [SpringContextShutdownHook] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2026-06-17 18:20:41.836  INFO 21832 --- [SpringContextShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
+2026-06-17 18:20:42.266  INFO 21832 --- [SpringContextShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.
+2026-06-17 18:20:49.700  INFO 6964 --- [main] com.ihwthms.base.BaseApplication         : Starting BaseApplication on DESKTOP-A170MA8 with PID 6964 (C:\Users\dell\IdeaProjects\ihwtrepo\target\classes started by dell in C:\Users\dell\IdeaProjects\ihwtrepo)
+2026-06-17 18:20:49.703 DEBUG 6964 --- [main] com.ihwthms.base.BaseApplication         : Running with Spring Boot v2.2.1.RELEASE, Spring v5.2.1.RELEASE
+2026-06-17 18:20:49.704  INFO 6964 --- [main] com.ihwthms.base.BaseApplication         : No active profile set, falling back to default profiles: default
+2026-06-17 18:20:49.802  WARN 6964 --- [background-preinit] o.s.h.c.j.Jackson2ObjectMapperBuilder    : For Jackson Kotlin classes support please add "com.fasterxml.jackson.module:jackson-module-kotlin" to the classpath
+2026-06-17 18:20:50.942  INFO 6964 --- [main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data repositories in DEFAULT mode.
+2026-06-17 18:20:51.113  INFO 6964 --- [main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 155ms. Found 9 repository interfaces.
+2026-06-17 18:20:52.078  INFO 6964 --- [main] trationDelegate$BeanPostProcessorChecker : Bean 'org.springframework.transaction.annotation.ProxyTransactionManagementConfiguration' of type [org.springframework.transaction.annotation.ProxyTransactionManagementConfiguration] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+2026-06-17 18:20:52.679  INFO 6964 --- [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port(s): 8083 (http)
+2026-06-17 18:20:52.696  INFO 6964 --- [main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2026-06-17 18:20:52.697  INFO 6964 --- [main] org.apache.catalina.core.StandardEngine  : Starting Servlet engine: [Apache Tomcat/9.0.27]
+2026-06-17 18:20:53.613  INFO 6964 --- [main] org.apache.jasper.servlet.TldScanner     : At least one JAR was scanned for TLDs yet contained no TLDs. Enable debug logging for this logger for a complete list of JARs that were scanned but no TLDs were found in them. Skipping unneeded JARs during scanning can improve startup time and JSP compilation time.
+2026-06-17 18:20:53.629  INFO 6964 --- [main] o.a.c.c.C.[Tomcat].[localhost].[/ihwt]   : Initializing Spring embedded WebApplicationContext
+2026-06-17 18:20:53.631  INFO 6964 --- [main] o.s.web.context.ContextLoader            : Root WebApplicationContext: initialization completed in 3756 ms
+2026-06-17 18:20:53.978  INFO 6964 --- [main] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2026-06-17 18:20:54.120  INFO 6964 --- [main] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 5.4.12.Final
+2026-06-17 18:20:54.638  INFO 6964 --- [main] o.hibernate.annotations.common.Version   : HCANN000001: Hibernate Commons Annotations {5.1.0.Final}
+2026-06-17 18:20:54.828  INFO 6964 --- [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2026-06-17 18:20:55.131  INFO 6964 --- [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2026-06-17 18:20:55.158  INFO 6964 --- [main] org.hibernate.dialect.Dialect            : HHH000400: Using dialect: org.hibernate.dialect.MySQL8Dialect
+2026-06-17 18:20:56.791  INFO 6964 --- [main] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000490: Using JtaPlatform implementation: [org.hibernate.engine.transaction.jta.platform.internal.NoJtaPlatform]
+2026-06-17 18:20:56.805  INFO 6964 --- [main] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-06-17 18:20:57.982  WARN 6964 --- [main] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2026-06-17 18:20:58.554  INFO 6964 --- [main] o.s.s.web.DefaultSecurityFilterChain     : Creating filter chain: any request, [org.springframework.security.web.context.request.async.WebAsyncManagerIntegrationFilter@5cea47a1, org.springframework.security.web.context.SecurityContextPersistenceFilter@548c5127, org.springframework.security.web.header.HeaderWriterFilter@7524125c, org.springframework.security.web.authentication.logout.LogoutFilter@13346a64, org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter@2e5c245d, org.springframework.security.web.savedrequest.RequestCacheAwareFilter@6e80de85, org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter@9a74a93, org.springframework.security.web.authentication.AnonymousAuthenticationFilter@2d527346, org.springframework.security.web.session.SessionManagementFilter@330d16af, org.springframework.security.web.access.ExceptionTranslationFilter@669469c9, org.springframework.security.web.access.intercept.FilterSecurityInterceptor@74b521c]
+2026-06-17 18:20:58.750  INFO 6964 --- [main] o.s.s.concurrent.ThreadPoolTaskExecutor  : Initializing ExecutorService 'applicationTaskExecutor'
+2026-06-17 18:20:59.137  INFO 6964 --- [main] o.s.s.c.ThreadPoolTaskScheduler          : Initializing ExecutorService 'taskScheduler'
+2026-06-17 18:20:59.255  INFO 6964 --- [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port(s): 8083 (http) with context path '/ihwt'
+2026-06-17 18:20:59.258  INFO 6964 --- [main] com.ihwthms.base.BaseApplication         : Started BaseApplication in 10.327 seconds (JVM running for 11.173)
+2026-06-17 18:21:41.483  INFO 6964 --- [http-nio-8083-exec-1] o.a.c.c.C.[Tomcat].[localhost].[/ihwt]   : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-06-17 18:21:41.483  INFO 6964 --- [http-nio-8083-exec-1] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+2026-06-17 18:21:41.493  INFO 6964 --- [http-nio-8083-exec-1] o.s.web.servlet.DispatcherServlet        : Completed initialization in 10 ms
+2026-06-17 18:37:47.589  INFO 6964 --- [SpringContextShutdownHook] o.s.s.c.ThreadPoolTaskScheduler          : Shutting down ExecutorService 'taskScheduler'
+2026-06-17 18:37:47.590  INFO 6964 --- [SpringContextShutdownHook] o.s.s.concurrent.ThreadPoolTaskExecutor  : Shutting down ExecutorService 'applicationTaskExecutor'
+2026-06-17 18:37:47.596  INFO 6964 --- [SpringContextShutdownHook] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2026-06-17 18:37:47.600  INFO 6964 --- [SpringContextShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
+2026-06-17 18:37:47.616  INFO 6964 --- [SpringContextShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.
+2026-06-17 18:38:02.079  INFO 24872 --- [main] com.ihwthms.base.BaseApplication         : Starting BaseApplication on DESKTOP-A170MA8 with PID 24872 (C:\Users\dell\IdeaProjects\ihwtrepo\target\classes started by dell in C:\Users\dell\IdeaProjects\ihwtrepo)
+2026-06-17 18:38:02.081 DEBUG 24872 --- [main] com.ihwthms.base.BaseApplication         : Running with Spring Boot v2.2.1.RELEASE, Spring v5.2.1.RELEASE
+2026-06-17 18:38:02.082  INFO 24872 --- [main] com.ihwthms.base.BaseApplication         : No active profile set, falling back to default profiles: default
+2026-06-17 18:38:02.220  WARN 24872 --- [background-preinit] o.s.h.c.j.Jackson2ObjectMapperBuilder    : For Jackson Kotlin classes support please add "com.fasterxml.jackson.module:jackson-module-kotlin" to the classpath
+2026-06-17 18:38:03.914  INFO 24872 --- [main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data repositories in DEFAULT mode.
+2026-06-17 18:38:04.109  INFO 24872 --- [main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 176ms. Found 10 repository interfaces.
+2026-06-17 18:38:05.288  INFO 24872 --- [main] trationDelegate$BeanPostProcessorChecker : Bean 'org.springframework.transaction.annotation.ProxyTransactionManagementConfiguration' of type [org.springframework.transaction.annotation.ProxyTransactionManagementConfiguration] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+2026-06-17 18:38:06.346  INFO 24872 --- [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port(s): 8083 (http)
+2026-06-17 18:38:06.366  INFO 24872 --- [main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2026-06-17 18:38:06.367  INFO 24872 --- [main] org.apache.catalina.core.StandardEngine  : Starting Servlet engine: [Apache Tomcat/9.0.27]
+2026-06-17 18:38:07.119  INFO 24872 --- [main] org.apache.jasper.servlet.TldScanner     : At least one JAR was scanned for TLDs yet contained no TLDs. Enable debug logging for this logger for a complete list of JARs that were scanned but no TLDs were found in them. Skipping unneeded JARs during scanning can improve startup time and JSP compilation time.
+2026-06-17 18:38:07.134  INFO 24872 --- [main] o.a.c.c.C.[Tomcat].[localhost].[/ihwt]   : Initializing Spring embedded WebApplicationContext
+2026-06-17 18:38:07.135  INFO 24872 --- [main] o.s.web.context.ContextLoader            : Root WebApplicationContext: initialization completed in 4858 ms
+2026-06-17 18:38:07.425  INFO 24872 --- [main] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2026-06-17 18:38:07.538  INFO 24872 --- [main] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 5.4.12.Final
+2026-06-17 18:38:07.783  INFO 24872 --- [main] o.hibernate.annotations.common.Version   : HCANN000001: Hibernate Commons Annotations {5.1.0.Final}
+2026-06-17 18:38:07.938  INFO 24872 --- [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2026-06-17 18:38:08.234  INFO 24872 --- [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2026-06-17 18:38:08.290  INFO 24872 --- [main] org.hibernate.dialect.Dialect            : HHH000400: Using dialect: org.hibernate.dialect.MySQL8Dialect
+2026-06-17 18:38:16.597  INFO 24872 --- [main] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000490: Using JtaPlatform implementation: [org.hibernate.engine.transaction.jta.platform.internal.NoJtaPlatform]
+2026-06-17 18:38:16.607  INFO 24872 --- [main] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-06-17 18:38:17.275  WARN 24872 --- [main] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2026-06-17 18:38:17.903  INFO 24872 --- [main] o.s.s.web.DefaultSecurityFilterChain     : Creating filter chain: any request, [org.springframework.security.web.context.request.async.WebAsyncManagerIntegrationFilter@6dbdbb69, org.springframework.security.web.context.SecurityContextPersistenceFilter@24888d8b, org.springframework.security.web.header.HeaderWriterFilter@29088be1, org.springframework.security.web.authentication.logout.LogoutFilter@1174e173, org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter@52a0bc48, org.springframework.security.web.savedrequest.RequestCacheAwareFilter@55c581e4, org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter@726e29d, org.springframework.security.web.authentication.AnonymousAuthenticationFilter@576a8b00, org.springframework.security.web.session.SessionManagementFilter@15a6a91f, org.springframework.security.web.access.ExceptionTranslationFilter@68dc2f53, org.springframework.security.web.access.intercept.FilterSecurityInterceptor@5542418c]
+2026-06-17 18:38:18.118  INFO 24872 --- [main] o.s.s.concurrent.ThreadPoolTaskExecutor  : Initializing ExecutorService 'applicationTaskExecutor'
+2026-06-17 18:38:19.610  INFO 24872 --- [main] o.s.s.c.ThreadPoolTaskScheduler          : Initializing ExecutorService 'taskScheduler'
+2026-06-17 18:38:19.859  INFO 24872 --- [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port(s): 8083 (http) with context path '/ihwt'
+2026-06-17 18:38:19.863  INFO 24872 --- [main] com.ihwthms.base.BaseApplication         : Started BaseApplication in 18.667 seconds (JVM running for 20.112)
+2026-06-17 18:40:26.675  INFO 24872 --- [http-nio-8083-exec-1] o.a.c.c.C.[Tomcat].[localhost].[/ihwt]   : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-06-17 18:40:26.675  INFO 24872 --- [http-nio-8083-exec-1] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+2026-06-17 18:40:26.682  INFO 24872 --- [http-nio-8083-exec-1] o.s.web.servlet.DispatcherServlet        : Completed initialization in 7 ms
+2026-06-17 18:45:16.273  INFO 24872 --- [SpringContextShutdownHook] o.s.s.c.ThreadPoolTaskScheduler          : Shutting down ExecutorService 'taskScheduler'
+2026-06-17 18:45:16.282  INFO 24872 --- [SpringContextShutdownHook] o.s.s.concurrent.ThreadPoolTaskExecutor  : Shutting down ExecutorService 'applicationTaskExecutor'
+2026-06-17 18:45:16.295  INFO 24872 --- [SpringContextShutdownHook] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2026-06-17 18:45:16.303  INFO 24872 --- [SpringContextShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
+2026-06-17 18:45:16.326  INFO 24872 --- [SpringContextShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.
+2026-06-17 18:45:24.153  INFO 14272 --- [main] com.ihwthms.base.BaseApplication         : Starting BaseApplication on DESKTOP-A170MA8 with PID 14272 (C:\Users\dell\IdeaProjects\ihwtrepo\target\classes started by dell in C:\Users\dell\IdeaProjects\ihwtrepo)
+2026-06-17 18:45:24.155 DEBUG 14272 --- [main] com.ihwthms.base.BaseApplication         : Running with Spring Boot v2.2.1.RELEASE, Spring v5.2.1.RELEASE
+2026-06-17 18:45:24.157  INFO 14272 --- [main] com.ihwthms.base.BaseApplication         : No active profile set, falling back to default profiles: default
+2026-06-17 18:45:24.341  WARN 14272 --- [background-preinit] o.s.h.c.j.Jackson2ObjectMapperBuilder    : For Jackson Kotlin classes support please add "com.fasterxml.jackson.module:jackson-module-kotlin" to the classpath
+2026-06-17 18:45:25.433  INFO 14272 --- [main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data repositories in DEFAULT mode.
+2026-06-17 18:45:25.650  INFO 14272 --- [main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 198ms. Found 10 repository interfaces.
+2026-06-17 18:45:26.796  INFO 14272 --- [main] trationDelegate$BeanPostProcessorChecker : Bean 'org.springframework.transaction.annotation.ProxyTransactionManagementConfiguration' of type [org.springframework.transaction.annotation.ProxyTransactionManagementConfiguration] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+2026-06-17 18:45:27.543  INFO 14272 --- [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port(s): 8083 (http)
+2026-06-17 18:45:27.564  INFO 14272 --- [main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2026-06-17 18:45:27.565  INFO 14272 --- [main] org.apache.catalina.core.StandardEngine  : Starting Servlet engine: [Apache Tomcat/9.0.27]
+2026-06-17 18:45:28.428  INFO 14272 --- [main] org.apache.jasper.servlet.TldScanner     : At least one JAR was scanned for TLDs yet contained no TLDs. Enable debug logging for this logger for a complete list of JARs that were scanned but no TLDs were found in them. Skipping unneeded JARs during scanning can improve startup time and JSP compilation time.
+2026-06-17 18:45:28.450  INFO 14272 --- [main] o.a.c.c.C.[Tomcat].[localhost].[/ihwt]   : Initializing Spring embedded WebApplicationContext
+2026-06-17 18:45:28.452  INFO 14272 --- [main] o.s.web.context.ContextLoader            : Root WebApplicationContext: initialization completed in 4092 ms
+2026-06-17 18:45:28.805  INFO 14272 --- [main] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2026-06-17 18:45:28.984  INFO 14272 --- [main] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 5.4.12.Final
+2026-06-17 18:45:29.628  INFO 14272 --- [main] o.hibernate.annotations.common.Version   : HCANN000001: Hibernate Commons Annotations {5.1.0.Final}
+2026-06-17 18:45:30.038  INFO 14272 --- [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2026-06-17 18:45:30.542  INFO 14272 --- [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2026-06-17 18:45:30.567  INFO 14272 --- [main] org.hibernate.dialect.Dialect            : HHH000400: Using dialect: org.hibernate.dialect.MySQL8Dialect
+2026-06-17 18:45:32.571  INFO 14272 --- [main] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000490: Using JtaPlatform implementation: [org.hibernate.engine.transaction.jta.platform.internal.NoJtaPlatform]
+2026-06-17 18:45:32.581  INFO 14272 --- [main] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-06-17 18:45:34.470  WARN 14272 --- [main] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2026-06-17 18:45:35.948  INFO 14272 --- [main] o.s.s.web.DefaultSecurityFilterChain     : Creating filter chain: any request, [org.springframework.security.web.context.request.async.WebAsyncManagerIntegrationFilter@6b9fc5c7, org.springframework.security.web.context.SecurityContextPersistenceFilter@1db5de29, org.springframework.security.web.header.HeaderWriterFilter@15afebcc, org.springframework.security.web.authentication.logout.LogoutFilter@4a977146, org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter@10f60e36, org.springframework.security.web.savedrequest.RequestCacheAwareFilter@1fb61db4, org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter@3c862522, org.springframework.security.web.authentication.AnonymousAuthenticationFilter@23d07ad3, org.springframework.security.web.session.SessionManagementFilter@3b18009f, org.springframework.security.web.access.ExceptionTranslationFilter@45b2d17b, org.springframework.security.web.access.intercept.FilterSecurityInterceptor@78141c58]
+2026-06-17 18:45:36.318  INFO 14272 --- [main] o.s.s.concurrent.ThreadPoolTaskExecutor  : Initializing ExecutorService 'applicationTaskExecutor'
+2026-06-17 18:45:37.111  INFO 14272 --- [main] o.s.s.c.ThreadPoolTaskScheduler          : Initializing ExecutorService 'taskScheduler'
+2026-06-17 18:45:37.433  INFO 14272 --- [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port(s): 8083 (http) with context path '/ihwt'
+2026-06-17 18:45:37.438  INFO 14272 --- [main] com.ihwthms.base.BaseApplication         : Started BaseApplication in 15.219 seconds (JVM running for 16.189)
+2026-06-17 18:46:17.068  INFO 14272 --- [http-nio-8083-exec-1] o.a.c.c.C.[Tomcat].[localhost].[/ihwt]   : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-06-17 18:46:17.069  INFO 14272 --- [http-nio-8083-exec-1] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+2026-06-17 18:46:17.076  INFO 14272 --- [http-nio-8083-exec-1] o.s.web.servlet.DispatcherServlet        : Completed initialization in 7 ms
+2026-06-17 18:56:40.857  INFO 14272 --- [SpringContextShutdownHook] o.s.s.c.ThreadPoolTaskScheduler          : Shutting down ExecutorService 'taskScheduler'
+2026-06-17 18:56:40.860  INFO 14272 --- [SpringContextShutdownHook] o.s.s.concurrent.ThreadPoolTaskExecutor  : Shutting down ExecutorService 'applicationTaskExecutor'
+2026-06-17 18:56:40.887  INFO 14272 --- [SpringContextShutdownHook] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2026-06-17 18:56:40.893  INFO 14272 --- [SpringContextShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
+2026-06-17 18:56:40.919  INFO 14272 --- [SpringContextShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.
+2026-06-17 18:56:47.215  INFO 2924 --- [main] com.ihwthms.base.BaseApplication         : Starting BaseApplication on DESKTOP-A170MA8 with PID 2924 (C:\Users\dell\IdeaProjects\ihwtrepo\target\classes started by dell in C:\Users\dell\IdeaProjects\ihwtrepo)
+2026-06-17 18:56:47.217 DEBUG 2924 --- [main] com.ihwthms.base.BaseApplication         : Running with Spring Boot v2.2.1.RELEASE, Spring v5.2.1.RELEASE
+2026-06-17 18:56:47.218  INFO 2924 --- [main] com.ihwthms.base.BaseApplication         : No active profile set, falling back to default profiles: default
+2026-06-17 18:56:47.329  WARN 2924 --- [background-preinit] o.s.h.c.j.Jackson2ObjectMapperBuilder    : For Jackson Kotlin classes support please add "com.fasterxml.jackson.module:jackson-module-kotlin" to the classpath
+2026-06-17 18:56:48.987  INFO 2924 --- [main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data repositories in DEFAULT mode.
+2026-06-17 18:56:49.167  INFO 2924 --- [main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 163ms. Found 10 repository interfaces.
+2026-06-17 18:56:50.114  INFO 2924 --- [main] trationDelegate$BeanPostProcessorChecker : Bean 'org.springframework.transaction.annotation.ProxyTransactionManagementConfiguration' of type [org.springframework.transaction.annotation.ProxyTransactionManagementConfiguration] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+2026-06-17 18:56:50.817  INFO 2924 --- [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port(s): 8083 (http)
+2026-06-17 18:56:50.847  INFO 2924 --- [main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2026-06-17 18:56:50.848  INFO 2924 --- [main] org.apache.catalina.core.StandardEngine  : Starting Servlet engine: [Apache Tomcat/9.0.27]
+2026-06-17 18:56:51.742  INFO 2924 --- [main] org.apache.jasper.servlet.TldScanner     : At least one JAR was scanned for TLDs yet contained no TLDs. Enable debug logging for this logger for a complete list of JARs that were scanned but no TLDs were found in them. Skipping unneeded JARs during scanning can improve startup time and JSP compilation time.
+2026-06-17 18:56:51.759  INFO 2924 --- [main] o.a.c.c.C.[Tomcat].[localhost].[/ihwt]   : Initializing Spring embedded WebApplicationContext
+2026-06-17 18:56:51.761  INFO 2924 --- [main] o.s.web.context.ContextLoader            : Root WebApplicationContext: initialization completed in 4388 ms
+2026-06-17 18:56:52.042  INFO 2924 --- [main] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2026-06-17 18:56:52.142  INFO 2924 --- [main] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 5.4.12.Final
+2026-06-17 18:56:52.370  INFO 2924 --- [main] o.hibernate.annotations.common.Version   : HCANN000001: Hibernate Commons Annotations {5.1.0.Final}
+2026-06-17 18:56:52.539  INFO 2924 --- [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2026-06-17 18:56:52.832  INFO 2924 --- [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2026-06-17 18:56:52.852  INFO 2924 --- [main] org.hibernate.dialect.Dialect            : HHH000400: Using dialect: org.hibernate.dialect.MySQL8Dialect
+2026-06-17 18:56:54.496  INFO 2924 --- [main] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000490: Using JtaPlatform implementation: [org.hibernate.engine.transaction.jta.platform.internal.NoJtaPlatform]
+2026-06-17 18:56:54.506  INFO 2924 --- [main] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-06-17 18:56:55.156  WARN 2924 --- [main] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2026-06-17 18:56:55.668  INFO 2924 --- [main] o.s.s.web.DefaultSecurityFilterChain     : Creating filter chain: any request, [org.springframework.security.web.context.request.async.WebAsyncManagerIntegrationFilter@2d97344c, org.springframework.security.web.context.SecurityContextPersistenceFilter@65f36591, org.springframework.security.web.header.HeaderWriterFilter@eaa07bb, org.springframework.security.web.authentication.logout.LogoutFilter@3e755d5f, org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter@6dbdbb69, org.springframework.security.web.savedrequest.RequestCacheAwareFilter@72b6fa98, org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter@52b32622, org.springframework.security.web.authentication.AnonymousAuthenticationFilter@7f839ec5, org.springframework.security.web.session.SessionManagementFilter@42095996, org.springframework.security.web.access.ExceptionTranslationFilter@750b200b, org.springframework.security.web.access.intercept.FilterSecurityInterceptor@24ce5d4c]
+2026-06-17 18:56:55.852  INFO 2924 --- [main] o.s.s.concurrent.ThreadPoolTaskExecutor  : Initializing ExecutorService 'applicationTaskExecutor'
+2026-06-17 18:56:56.290  INFO 2924 --- [main] o.s.s.c.ThreadPoolTaskScheduler          : Initializing ExecutorService 'taskScheduler'
+2026-06-17 18:56:56.537  INFO 2924 --- [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port(s): 8083 (http) with context path '/ihwt'
+2026-06-17 18:56:56.541  INFO 2924 --- [main] com.ihwthms.base.BaseApplication         : Started BaseApplication in 10.106 seconds (JVM running for 10.902)
+2026-06-17 18:57:25.104  INFO 2924 --- [http-nio-8083-exec-1] o.a.c.c.C.[Tomcat].[localhost].[/ihwt]   : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-06-17 18:57:25.105  INFO 2924 --- [http-nio-8083-exec-1] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+2026-06-17 18:57:25.113  INFO 2924 --- [http-nio-8083-exec-1] o.s.web.servlet.DispatcherServlet        : Completed initialization in 8 ms

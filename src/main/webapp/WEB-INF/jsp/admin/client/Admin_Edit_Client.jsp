@@ -62,9 +62,29 @@
                         </c:forEach>
                     </select>
                 </div>
-                <div>
+                <div style="position: relative;" class="searchable-select-container">
                     <label style="display:block;margin-bottom:4px;font-size:0.85rem;font-weight:600;color:#64748b;">City</label>
-                    <input type="text" name="city" value="${CLIENT_OBJ.city}" style="width:100%;padding:10px;border:1px solid #e2e8f0;border-radius:8px;">
+                    <div class="searchable-select-trigger" onclick="toggleSelectDropdown(this)" style="display:flex; justify-content:space-between; align-items:center; width:100%; padding:10px; border:1px solid #e2e8f0; border-radius:8px; background:#fff; cursor:pointer; font-size:14px; box-sizing:border-box;">
+                        <span class="selected-text" style="color: #1e293b;">
+                            <c:choose>
+                                <c:when test="${not empty CLIENT_OBJ.cityId}">
+                                    <c:forEach var="c" items="${CITIES}"><c:if test="${CLIENT_OBJ.cityId == c.id}">${c.name}</c:if></c:forEach>
+                                </c:when>
+                                <c:otherwise>-- Select City --</c:otherwise>
+                            </c:choose>
+                        </span>
+                        <span style="font-size:10px; color:#64748b;">▼</span>
+                    </div>
+                    <div class="searchable-select-options-panel" style="display:none; position:absolute; z-index:999; width:100%; background:#fff; border:1px solid #e2e8f0; border-radius:8px; box-shadow:0 10px 25px rgba(0,0,0,0.08); margin-top:4px; box-sizing:border-box; padding:8px;">
+                        <input type="text" placeholder="Search city..." onkeyup="filterSelectOptions(this)" style="width:100%; padding:8px 10px; border:1px solid #e2e8f0; border-radius:6px; font-size:14px; outline:none; box-sizing:border-box; margin-bottom:6px;" autocomplete="off">
+                        <div class="options-list-container" style="max-height:160px; overflow-y:auto;">
+                            <div class="searchable-option-item" data-value="" onclick="selectOption(this, '')" style="padding:8px 10px; font-size:14px; cursor:pointer; border-radius:6px; color:#64748b;">-- Select City --</div>
+                            <c:forEach var="c" items="${CITIES}">
+                                <div class="searchable-option-item" data-value="${c.id}" onclick="selectOption(this, '${c.id}')" style="padding:8px 10px; font-size:14px; cursor:pointer; border-radius:6px; color:#1e293b;">${c.name}</div>
+                            </c:forEach>
+                        </div>
+                    </div>
+                    <input type="hidden" name="cityId" class="hidden-select-value" value="${CLIENT_OBJ.cityId}">
                 </div>
                 <div>
                     <label style="display:block;margin-bottom:4px;font-size:0.85rem;font-weight:600;color:#64748b;">Country</label>
@@ -113,5 +133,42 @@
         </form>
     </div>
 </div>
+
+<script>
+/* ── Searchable Select Dropdown ─────────────────────── */
+function toggleSelectDropdown(trigger) {
+    var panel = trigger.nextElementSibling;
+    var isOpen = panel.style.display === 'block';
+    document.querySelectorAll('.searchable-select-options-panel').forEach(function(p) { p.style.display = 'none'; });
+    if (!isOpen) {
+        panel.style.display = 'block';
+        var searchInput = panel.querySelector('input[type="text"]');
+        if (searchInput) { searchInput.value = ''; searchInput.focus(); }
+        panel.querySelectorAll('.searchable-option-item').forEach(function(opt) { opt.style.display = ''; });
+    }
+}
+
+function filterSelectOptions(input) {
+    var filter = input.value.toLowerCase();
+    var items = input.parentElement.querySelectorAll('.searchable-option-item');
+    items.forEach(function(item) {
+        var text = item.textContent.toLowerCase();
+        item.style.display = text.indexOf(filter) > -1 ? '' : 'none';
+    });
+}
+
+function selectOption(item, value) {
+    var container = item.closest('.searchable-select-container');
+    container.querySelector('.selected-text').textContent = item.textContent;
+    container.querySelector('.hidden-select-value').value = value;
+    container.querySelector('.searchable-select-options-panel').style.display = 'none';
+}
+
+document.addEventListener('click', function(e) {
+    if (!e.target.closest('.searchable-select-container')) {
+        document.querySelectorAll('.searchable-select-options-panel').forEach(function(p) { p.style.display = 'none'; });
+    }
+});
+</script>
 </body>
 </html>

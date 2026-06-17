@@ -54,7 +54,12 @@ public class ClientService {
                 predicates.add(cb.equal(root.get("active"), active));
             }
             if (city != null && !city.trim().isEmpty()) {
-                predicates.add(cb.like(cb.lower(root.get("city")), "%" + city.toLowerCase() + "%"));
+                try {
+                    Long cityId = Long.parseLong(city.trim());
+                    predicates.add(cb.equal(root.get("city").get("id"), cityId));
+                } catch (NumberFormatException e) {
+                    predicates.add(cb.like(cb.lower(root.get("city").get("name")), "%" + city.toLowerCase() + "%"));
+                }
             }
             return cb.and(predicates.toArray(new Predicate[0]));
         };
@@ -71,7 +76,12 @@ public class ClientService {
                 predicates.add(cb.equal(root.get("active"), active));
             }
             if (city != null && !city.trim().isEmpty()) {
-                predicates.add(cb.like(cb.lower(root.get("city")), "%" + city.toLowerCase() + "%"));
+                try {
+                    Long cityId = Long.parseLong(city.trim());
+                    predicates.add(cb.equal(root.get("city").get("id"), cityId));
+                } catch (NumberFormatException e) {
+                    predicates.add(cb.like(cb.lower(root.get("city").get("name")), "%" + city.toLowerCase() + "%"));
+                }
             }
             return cb.and(predicates.toArray(new Predicate[0]));
         };

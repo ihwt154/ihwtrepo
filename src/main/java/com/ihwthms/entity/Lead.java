@@ -28,8 +28,9 @@ public class Lead {
     @Column(name = "mobileNumber", length = 20)
     private String mobileNumber;
 
-    @Column(length = 100)
-    private String city;
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "city_id")
+    private City city;
 
     @Column(length = 100)
     private String country;
@@ -115,8 +116,8 @@ public class Lead {
     public String getMobileNumber() { return mobileNumber; }
     public void setMobileNumber(String mobileNumber) { this.mobileNumber = mobileNumber; }
 
-    public String getCity() { return city; }
-    public void setCity(String city) { this.city = city; }
+    public City getCity() { return city; }
+    public void setCity(City city) { this.city = city; }
 
     public String getCountry() { return country; }
     public void setCountry(String country) { this.country = country; }

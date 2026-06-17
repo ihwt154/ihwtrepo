@@ -28,7 +28,7 @@
                     ${centralConfig.companyName}
                 </c:when>
                 <c:otherwise>
-                    International Chamber of Healthcare & Medical Tourism
+                    CRM
                 </c:otherwise>
             </c:choose>
         </div>

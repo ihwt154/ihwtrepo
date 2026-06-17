@@ -9,6 +9,7 @@ public class ClientDTO {
     private String mobile;
     private String emailId;
     private String city;
+    private Long cityId;
     private String country;
     private String clientStatus;
     private Long assignedTo;
@@ -31,7 +32,10 @@ public class ClientDTO {
         this.clientName = e.getClientName();
         this.mobile = e.getMobile();
         this.emailId = e.getEmailId();
-        this.city = e.getCity();
+        if (e.getCity() != null) {
+            this.city = e.getCity().getName();
+            this.cityId = e.getCity().getId();
+        }
         this.country = e.getCountry();
         this.clientStatus = e.getClientStatus();
         this.assignedTo = e.getAssignedTo();
@@ -105,4 +109,7 @@ public class ClientDTO {
 
     public Boolean getActive() { return active; }
     public void setActive(Boolean active) { this.active = active; }
+
+    public Long getCityId() { return cityId; }
+    public void setCityId(Long cityId) { this.cityId = cityId; }
 }
