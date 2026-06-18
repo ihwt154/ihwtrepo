@@ -12,7 +12,8 @@ import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
-
+import javax.net.ssl.*;
+import java.security.cert.X509Certificate;
 import javax.mail.internet.MimeMessage;
 import java.util.*;
 
@@ -166,26 +167,50 @@ public class NotificationService {
         }
 
         try {
+            TrustManager[] trustAllCerts = new TrustManager[]{
+                    new X509TrustManager() {
+                        public X509Certificate[] getAcceptedIssuers() { return null; }
+                        public void checkClientTrusted(X509Certificate[] certs, String authType) {}
+                        public void checkServerTrusted(X509Certificate[] certs, String authType) {}
+                    }
+            };
+
+            SSLContext sc = SSLContext.getInstance("TLS");
+            sc.init(null, trustAllCerts, new java.security.SecureRandom());
+
+            HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
+            HttpsURLConnection.setDefaultHostnameVerifier((hostname, session) -> true);
             RestTemplate restTemplate = new RestTemplate();
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);
             if (apiKey != null && !apiKey.trim().isEmpty()) {
-                headers.set("Authorization", "Bearer " + apiKey);
-                headers.set("apikey", apiKey);
+                headers.set("Authorization", "Basic " + apiKey);
             }
 
+            Map<String, Object> bodyValues = new HashMap<>();
+            bodyValues.put("1", lead.getLeadName());
+            bodyValues.put("2", lead.getLeadTitle() != null ? lead.getLeadTitle() : "General Inquiry");
+            bodyValues.put("3", config.getCompanyName() != null ? config.getCompanyName() : "IHWT Federation");
+
             Map<String, Object> requestBody = new HashMap<>();
-            requestBody.put("to", recipientMobile);
-            requestBody.put("templateId", templateId != null ? templateId : "lead_registration_template");
-            
-            List<String> parameters = new ArrayList<>();
-            parameters.add(lead.getLeadName());
-            parameters.add(lead.getLeadTitle() != null ? lead.getLeadTitle() : "General Inquiry");
-            parameters.add(config.getCompanyName() != null ? config.getCompanyName() : "IHWT CRM");
-            requestBody.put("parameters", parameters);
+            requestBody.put("country_code", "91");
+            requestBody.put("mobile", recipientMobile);
+            requestBody.put("wid", templateId);
+            requestBody.put("type", "text");
+            requestBody.put("bodyValues", bodyValues);
 
             HttpEntity<Map<String, Object>> entity = new HttpEntity<>(requestBody, headers);
-            ResponseEntity<String> response = restTemplate.postForEntity(apiUrl, entity, String.class);
+            System.out.println("========== WHATSAPP REQUEST ==========");
+            System.out.println("API URL: " + apiUrl);
+            System.out.println("Template ID: " + templateId);
+            System.out.println("Mobile: " + recipientMobile);
+            System.out.println("Request Body: " + requestBody);
+            System.out.println("=====================================");
+            ResponseEntity<String> response =
+                    restTemplate.postForEntity(apiUrl, entity, String.class);
+
+            System.out.println("WhatsApp notification API response: "
+                    + response.getStatusCode() + " - " + response.getBody());
             System.out.println("WhatsApp notification API response: " + response.getStatusCode() + " - " + response.getBody());
         } catch (Exception e) {
             System.err.println("Error sending WhatsApp notification: " + e.getMessage());

@@ -48,8 +48,7 @@ public class CentralConfigEntityDTO {
     private String whatsAppApiUrl;
     private String whatsAppApiKey;
     private String whatsAppRegistrationTemplateId;
-    private String whatsAppStayQuotationTemplateId;
-    private String whatsAppGuestQuotationTemplateId;
+
 
     // Email / SMTP Settings
     private String emailSmtpHost;
@@ -158,11 +157,7 @@ public class CentralConfigEntityDTO {
     public String getWhatsAppRegistrationTemplateId() { return whatsAppRegistrationTemplateId; }
     public void setWhatsAppRegistrationTemplateId(String id) { this.whatsAppRegistrationTemplateId = id; }
 
-    public String getWhatsAppStayQuotationTemplateId() { return whatsAppStayQuotationTemplateId; }
-    public void setWhatsAppStayQuotationTemplateId(String id) { this.whatsAppStayQuotationTemplateId = id; }
 
-    public String getWhatsAppGuestQuotationTemplateId() { return whatsAppGuestQuotationTemplateId; }
-    public void setWhatsAppGuestQuotationTemplateId(String id) { this.whatsAppGuestQuotationTemplateId = id; }
 
     public String getEmailSmtpHost() { return emailSmtpHost; }
     public void setEmailSmtpHost(String emailSmtpHost) { this.emailSmtpHost = emailSmtpHost; }

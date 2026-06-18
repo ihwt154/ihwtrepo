@@ -115,11 +115,7 @@ public class CentralConfigEntity {
     @Column(name = "whats_app_registration_template_id")
     private String whatsAppRegistrationTemplateId;
 
-    @Column(name = "whats_app_stay_quotation_template_id")
-    private String whatsAppStayQuotationTemplateId;
 
-    @Column(name = "whats_app_guest_quotation_template_id")
-    private String whatsAppGuestQuotationTemplateId;
 
     // Email / SMTP Settings
     @Column(name = "email_smtp_host")
@@ -253,11 +249,6 @@ public class CentralConfigEntity {
     public String getWhatsAppRegistrationTemplateId() { return whatsAppRegistrationTemplateId; }
     public void setWhatsAppRegistrationTemplateId(String whatsAppRegistrationTemplateId) { this.whatsAppRegistrationTemplateId = whatsAppRegistrationTemplateId; }
 
-    public String getWhatsAppStayQuotationTemplateId() { return whatsAppStayQuotationTemplateId; }
-    public void setWhatsAppStayQuotationTemplateId(String whatsAppStayQuotationTemplateId) { this.whatsAppStayQuotationTemplateId = whatsAppStayQuotationTemplateId; }
-
-    public String getWhatsAppGuestQuotationTemplateId() { return whatsAppGuestQuotationTemplateId; }
-    public void setWhatsAppGuestQuotationTemplateId(String whatsAppGuestQuotationTemplateId) { this.whatsAppGuestQuotationTemplateId = whatsAppGuestQuotationTemplateId; }
 
     public String getEmailSmtpHost() { return emailSmtpHost; }
     public void setEmailSmtpHost(String emailSmtpHost) { this.emailSmtpHost = emailSmtpHost; }

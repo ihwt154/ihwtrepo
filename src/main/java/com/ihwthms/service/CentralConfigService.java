@@ -76,8 +76,7 @@ public class CentralConfigService {
         entity.setWhatsAppApiUrl(dto.getWhatsAppApiUrl());
         entity.setWhatsAppApiKey(dto.getWhatsAppApiKey());
         entity.setWhatsAppRegistrationTemplateId(dto.getWhatsAppRegistrationTemplateId());
-        entity.setWhatsAppStayQuotationTemplateId(dto.getWhatsAppStayQuotationTemplateId());
-        entity.setWhatsAppGuestQuotationTemplateId(dto.getWhatsAppGuestQuotationTemplateId());
+
 
         entity.setEmailSmtpHost(dto.getEmailSmtpHost());
         entity.setEmailSmtpPort(dto.getEmailSmtpPort());
@@ -132,8 +131,7 @@ public class CentralConfigService {
         dto.setWhatsAppApiUrl(entity.getWhatsAppApiUrl());
         dto.setWhatsAppApiKey(entity.getWhatsAppApiKey());
         dto.setWhatsAppRegistrationTemplateId(entity.getWhatsAppRegistrationTemplateId());
-        dto.setWhatsAppStayQuotationTemplateId(entity.getWhatsAppStayQuotationTemplateId());
-        dto.setWhatsAppGuestQuotationTemplateId(entity.getWhatsAppGuestQuotationTemplateId());
+
 
         dto.setEmailSmtpHost(entity.getEmailSmtpHost());
         dto.setEmailSmtpPort(entity.getEmailSmtpPort());

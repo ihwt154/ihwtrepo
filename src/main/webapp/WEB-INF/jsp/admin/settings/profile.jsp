@@ -982,18 +982,7 @@
                                                                                     <form:input
                                                                                         path="whatsAppRegistrationTemplateId" />
                                                                                 </div>
-                                                                                <div class="form-group">
-                                                                                    <label>Stay Quotation Template
-                                                                                        ID</label>
-                                                                                    <form:input
-                                                                                        path="whatsAppStayQuotationTemplateId" />
-                                                                                </div>
-                                                                                <div class="form-group">
-                                                                                    <label>Guest Quotation Template
-                                                                                        ID</label>
-                                                                                    <form:input
-                                                                                        path="whatsAppGuestQuotationTemplateId" />
-                                                                                </div>
+
                                                                             </div>
                                                                         </div>
 
