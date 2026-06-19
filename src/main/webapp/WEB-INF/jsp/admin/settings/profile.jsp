@@ -591,7 +591,7 @@
                                 <button class="sidebar-item active" id="tab-profile-btn" onclick="showTab('profile')">
                                     <span class="si-icon">👤</span> My Profile
                                 </button>
-                                <c:if test="${CURRENT_USER.hasRole('ADMIN') || CURRENT_USER.hasRole('SUPERADMIN')}">
+                                <c:if test="${CURRENT_USER.hasRole('SUPERADMIN')}">
                                     <button class="sidebar-item" id="tab-config-btn" onclick="showTab('config')">
                                         <span class="si-icon">⚙️</span> Central Config
                                     </button>
@@ -600,7 +600,7 @@
                                     <span class="si-icon">🔑</span> Change Password
                                 </button>
 
-                                <c:if test="${CURRENT_USER.hasRole('ADMIN') || CURRENT_USER.hasRole('SUPERADMIN')}">
+                                <c:if test="${CURRENT_USER.hasRole('SUPERADMIN')}">
                                     <div class="sidebar-section-label" style="margin-top:12px;">Administration</div>
                                     <button class="sidebar-item" id="tab-permissions-btn" onclick="showTab('permissions')">
                                         <span class="si-icon">🛡️</span> Permissions
@@ -798,7 +798,7 @@
                                                 </div>
                                     </div>
 
-                                    <c:if test="${CURRENT_USER.hasRole('ADMIN') || CURRENT_USER.hasRole('SUPERADMIN')}">
+                                    <c:if test="${CURRENT_USER.hasRole('SUPERADMIN')}">
                                     <%-- ── CENTRAL CONFIG PANEL ───────────────────────── --%>
                                         <div id="tab-config" class="tab-panel">
 
@@ -1120,7 +1120,7 @@
                                                 </div>
                                             </div>
 
-                                            <c:if test="${CURRENT_USER.hasRole('ADMIN') || CURRENT_USER.hasRole('SUPERADMIN')}">
+                                            <c:if test="${CURRENT_USER.hasRole('SUPERADMIN')}">
                                             <%-- ── PERMISSIONS PANEL ─────────────────────────── --%>
                                                 <div id="tab-permissions" class="tab-panel">
 

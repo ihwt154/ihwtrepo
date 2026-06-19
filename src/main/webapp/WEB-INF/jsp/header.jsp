@@ -97,6 +97,9 @@
                         <li><a href="${pageContext.request.contextPath}/admin/client/sources" class="gs-dropdown-item">Client Source</a></li>
                         <li><a href="${pageContext.request.contextPath}/admin/client/types" class="gs-dropdown-item">Client Type</a></li>
                     </sec:authorize>
+                    <sec:authorize access="hasRole('SUPERADMIN')">
+                        <li><a href="${pageContext.request.contextPath}/city/add" class="gs-dropdown-item">&#127961; Add City</a></li>
+                    </sec:authorize>
                 </ul>
             </li>
         </sec:authorize>

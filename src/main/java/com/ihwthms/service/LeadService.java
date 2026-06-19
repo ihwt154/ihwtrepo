@@ -11,6 +11,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import com.ihwthms.entity.User;
 
 import javax.persistence.criteria.Predicate;
 import java.util.ArrayList;
@@ -26,15 +27,33 @@ public class LeadService {
     @Autowired
     private LeadsFollowupRepository followupRepository;
 
-    /**
-     * Statuses that count as "Open" in the filter.
-     */
+    @Autowired
+    private com.ihwthms.repository.UserRepository userRepository;
+
+    private User getLoggedInUser() {
+        String username = org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication().getName();
+        return userRepository.findByUsername(username).orElse(null);
+    }
+
+    private boolean isPrivileged(User user) {
+        if (user == null) return false;
+        return user.hasRole("ADMIN") || user.hasRole("SUPERADMIN");
+    }
+
     private static final List<String> OPEN_STATUSES = Arrays.asList("Open", "Work In Progress");
 
     /**
      * Statuses that count as "Closed" in the filter.
      */
     private static final List<String> CLOSED_STATUSES = Arrays.asList("Won-Converted", "Failed-Closed", "Duplicate");
+
+    public void saveFollowup(LeadsFollowupEntity followup) {
+        followupRepository.save(followup);
+    }
+
+    public List<LeadsFollowupEntity> findFollowupsByLeadId(Long leadId) {
+        return followupRepository.findByLeadEntity_IdOrderByNextfollowuptimeDesc(leadId);
+    }
 
     public Lead saveLead(Lead lead) {
         lead.setUpdatedAt(java.time.LocalDateTime.now());
@@ -46,13 +65,7 @@ public class LeadService {
                 .orElseThrow(() -> new RuntimeException("Lead not found: " + id));
     }
 
-    public void saveFollowup(LeadsFollowupEntity followup) {
-        followupRepository.save(followup);
-    }
 
-    public List<LeadsFollowupEntity> findFollowupsByLeadId(Long leadId) {
-        return followupRepository.findByLeadEntity_IdOrderByNextfollowuptimeDesc(leadId);
-    }
 
     /**
      * Build status predicates for the "Open"/"Closed" grouped filter.

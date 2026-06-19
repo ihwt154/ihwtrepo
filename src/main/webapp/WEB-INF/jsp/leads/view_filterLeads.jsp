@@ -175,6 +175,7 @@
                     </c:forEach>
                 </select>
             </div>
+            <c:if test="${CURRENT_USER.hasRole('ADMIN') || CURRENT_USER.hasRole('SUPERADMIN')}">
             <div>
                 <label style="font-size:0.8rem;font-weight:600;color:#64748b;display:block;margin-bottom:4px;">Assigned To</label>
                 <select name="assignedTo" style="width:100%;padding:8px;border:1px solid #e2e8f0;border-radius:8px;">
@@ -184,6 +185,7 @@
                     </c:forEach>
                 </select>
             </div>
+            </c:if>
             <div style="display:flex;gap:8px;">
                 <button type="submit" style="padding:8px 16px;background:var(--accent-primary);color:#fff;border:none;border-radius:8px;cursor:pointer;font-weight:600;flex:1;">Filter</button>
                 <a href="${pageContext.request.contextPath}/view_filter_leads" style="padding:8px 14px;background:#f1f5f9;color:#475569;border-radius:8px;text-decoration:none;display:flex;align-items:center;">Reset</a>

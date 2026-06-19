@@ -70,13 +70,20 @@
                             <option value="${src.sourceName}" ${LEAD_OBJ.leadSource == src.sourceName ? 'selected' : ''}>${src.sourceName}</option>
                         </c:forEach>
                     </select></div>
-                <div><label style="display:block;margin-bottom:4px;font-size:0.85rem;font-weight:600;color:#64748b;">Assigned To</label>
-                    <select name="assignedTo" style="width:100%;padding:10px;border:1px solid #e2e8f0;border-radius:8px;">
-                        <option value="">-- User --</option>
-                        <c:forEach var="entry" items="${ACTIVE_USERS_MAP}">
-                            <option value="${entry.key}" ${LEAD_OBJ.assignedTo == entry.key ? 'selected' : ''}>${entry.value}</option>
-                        </c:forEach>
-                    </select></div>
+                <c:choose>
+                    <c:when test="${CURRENT_USER.hasRole('ADMIN') || CURRENT_USER.hasRole('SUPERADMIN')}">
+                        <div><label style="display:block;margin-bottom:4px;font-size:0.85rem;font-weight:600;color:#64748b;">Assigned To</label>
+                            <select name="assignedTo" style="width:100%;padding:10px;border:1px solid #e2e8f0;border-radius:8px;">
+                                <option value="">-- User --</option>
+                                <c:forEach var="entry" items="${ACTIVE_USERS_MAP}">
+                                    <option value="${entry.key}" ${LEAD_OBJ.assignedTo == entry.key ? 'selected' : ''}>${entry.value}</option>
+                                </c:forEach>
+                            </select></div>
+                    </c:when>
+                    <c:otherwise>
+                        <input type="hidden" name="assignedTo" value="${LEAD_OBJ.assignedTo != null ? LEAD_OBJ.assignedTo : CURRENT_USER.id}">
+                    </c:otherwise>
+                </c:choose>
             </div>
 
             <div style="margin-bottom:24px;">

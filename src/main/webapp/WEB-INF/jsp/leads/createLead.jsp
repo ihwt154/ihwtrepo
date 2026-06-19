@@ -167,15 +167,22 @@
                         </c:forEach>
                     </select>
                 </div>
-                <div>
-                    <label class="form-label-text" for="assignedTo">Assigned To <span class="field-required">*</span></label>
-                    <select id="assignedTo" name="assignedTo" class="form-select">
-                        <option value="">-- Select User --</option>
-                        <c:forEach var="entry" items="${ACTIVE_USERS_MAP}">
-                            <option value="${entry.key}" <c:if test="${LEAD_OBJ.assignedTo == entry.key}">selected</c:if>>${entry.value}</option>
-                        </c:forEach>
-                    </select>
-                </div>
+                <c:choose>
+                    <c:when test="${CURRENT_USER.hasRole('ADMIN') || CURRENT_USER.hasRole('SUPERADMIN')}">
+                        <div>
+                            <label class="form-label-text" for="assignedTo">Assigned To <span class="field-required">*</span></label>
+                            <select id="assignedTo" name="assignedTo" class="form-select">
+                                <option value="">-- Select User --</option>
+                                <c:forEach var="entry" items="${ACTIVE_USERS_MAP}">
+                                    <option value="${entry.key}" <c:if test="${LEAD_OBJ.assignedTo == entry.key}">selected</c:if>>${entry.value}</option>
+                                </c:forEach>
+                            </select>
+                        </div>
+                    </c:when>
+                    <c:otherwise>
+                        <input type="hidden" id="assignedTo" name="assignedTo" value="${CURRENT_USER.id}">
+                    </c:otherwise>
+                </c:choose>
             </div>
 
             <%-- ── NOTIFICATION CONTROLS ────────────────────────────────────── --%>

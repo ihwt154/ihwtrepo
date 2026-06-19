@@ -74,6 +74,7 @@ public class LeadController {
         mv.addObject("LEAD_STATUSES", workloadStatusService.getActiveLeadStatuses());
         mv.addObject("PRIORITIES", PRIORITIES);
         mv.addObject("CLIENT_SOURCES", clientSourceService.findAllActive());
+        mv.addObject("CURRENT_USER", getLoggedInUser());
         return mv;
     }
 
@@ -85,6 +86,12 @@ public class LeadController {
         if (dto.getClientId() == null || dto.getClientId() <= 0) {
             ra.addFlashAttribute("error", "Please select a valid client before creating a lead.");
             return "redirect:/view_add_lead_form";
+        }
+
+        // Enforce lead assignment for non-privileged users
+        User loggedIn = getLoggedInUser();
+        if (loggedIn != null && !(loggedIn.hasRole("ADMIN") || loggedIn.hasRole("SUPERADMIN"))) {
+            dto.setAssignedTo(loggedIn.getId());
         }
 
         // Validate required lead fields
@@ -116,7 +123,6 @@ public class LeadController {
 
         // Create new Lead entity and populate from DTO
         Lead lead = new Lead();
-        User loggedIn = getLoggedInUser();
         populateLeadFromDTO(lead, dto, loggedIn);
 
         // Fallback for lead name if not provided
@@ -160,6 +166,13 @@ public class LeadController {
             @RequestParam(required = false) Long assignedTo,
             @RequestParam(required = false) String priority) {
 
+        // Enforce lead visibility based on user role
+        User user = getLoggedInUser();
+        if (user != null && !(user.hasRole("ADMIN") || user.hasRole("SUPERADMIN"))) {
+            // Regular users see ONLY their own leads
+            assignedTo = user.getId();
+        }
+
         ModelAndView mv = new ModelAndView("leads/view_filterLeads");
         Page<Lead> pagedLeads = leadService.filterLeads(page, pageSize, leadStatus,
                 leadSource, clientName, assignedTo, priority);
@@ -168,6 +181,7 @@ public class LeadController {
         for (Lead lead : pagedLeads.getContent()) {
             dtoList.add(buildLeadDTO(lead));
         }
+
 
         String statusJoined = "";
         if (leadStatus != null && !leadStatus.isEmpty()) {
@@ -193,28 +207,45 @@ public class LeadController {
         mv.addObject("f_clientName", clientName);
         mv.addObject("f_assignedTo", assignedTo);
         mv.addObject("f_priority", priority);
+        mv.addObject("CURRENT_USER", user);
         return mv;
     }
 
     // ─── VIEW LEAD DETAILS ───────────────────────────────────────────────────
     @GetMapping("/view_lead_details")
-    public ModelAndView viewLeadDetails(@RequestParam Long leadId) {
-        ModelAndView mv = new ModelAndView("leads/viewLeadDetails");
+    public ModelAndView viewLeadDetails(@RequestParam Long leadId, RedirectAttributes ra) {
+        User user = getLoggedInUser();
         Lead lead = leadService.findById(leadId);
+        if (user != null && !(user.hasRole("ADMIN") || user.hasRole("SUPERADMIN"))) {
+            if (lead.getAssignedTo() == null || !lead.getAssignedTo().equals(user.getId())) {
+                ra.addFlashAttribute("error", "You do not have permission to view this lead.");
+                return new ModelAndView("redirect:/view_filter_leads");
+            }
+        }
+        ModelAndView mv = new ModelAndView("leads/viewLeadDetails");
         mv.addObject("LEAD_OBJ", buildLeadDTO(lead));
+        mv.addObject("CURRENT_USER", user);
         return mv;
     }
 
     // ─── EDIT LEAD FORM ──────────────────────────────────────────────────────
     @GetMapping("/view_edit_lead_form")
-    public ModelAndView viewEditLeadForm(@RequestParam Long leadId) {
-        ModelAndView mv = new ModelAndView("leads/editLead");
+    public ModelAndView viewEditLeadForm(@RequestParam Long leadId, RedirectAttributes ra) {
+        User user = getLoggedInUser();
         Lead lead = leadService.findById(leadId);
+        if (user != null && !(user.hasRole("ADMIN") || user.hasRole("SUPERADMIN"))) {
+            if (lead.getAssignedTo() == null || !lead.getAssignedTo().equals(user.getId())) {
+                ra.addFlashAttribute("error", "You do not have permission to edit this lead.");
+                return new ModelAndView("redirect:/view_filter_leads");
+            }
+        }
+        ModelAndView mv = new ModelAndView("leads/editLead");
         mv.addObject("LEAD_OBJ", buildLeadDTO(lead));
         mv.addObject("ACTIVE_USERS_MAP", getActiveUsersMap());
         mv.addObject("LEAD_STATUSES", workloadStatusService.getActiveLeadStatuses());
         mv.addObject("PRIORITIES", PRIORITIES);
         mv.addObject("CLIENT_SOURCES", clientSourceService.findAllActive());
+        mv.addObject("CURRENT_USER", user);
         return mv;
     }
 
@@ -224,6 +255,13 @@ public class LeadController {
                            RedirectAttributes ra) {
         User loggedIn = getLoggedInUser();
         Lead lead = leadService.findById(dto.getLeadId());
+        if (loggedIn != null && !(loggedIn.hasRole("ADMIN") || loggedIn.hasRole("SUPERADMIN"))) {
+            if (lead.getAssignedTo() == null || !lead.getAssignedTo().equals(loggedIn.getId())) {
+                ra.addFlashAttribute("error", "You do not have permission to edit this lead.");
+                return "redirect:/view_filter_leads";
+            }
+            dto.setAssignedTo(loggedIn.getId());
+        }
         populateLeadFromDTO(lead, dto, loggedIn);
 
         if (dto.getClientId() != null && dto.getClientId() > 0) {
@@ -242,9 +280,16 @@ public class LeadController {
 
     // ─── FOLLOWUP DETAILS PAGE ───────────────────────────────────────────────
     @GetMapping("view_lead_followup_details")
-    public ModelAndView viewFollowupDetails(@RequestParam Long leadId) {
-        ModelAndView mv = new ModelAndView("leads/viewLeadFollowupDetails");
+    public ModelAndView viewFollowupDetails(@RequestParam Long leadId, RedirectAttributes ra) {
+        User user = getLoggedInUser();
         Lead lead = leadService.findById(leadId);
+        if (user != null && !(user.hasRole("ADMIN") || user.hasRole("SUPERADMIN"))) {
+            if (lead.getAssignedTo() == null || !lead.getAssignedTo().equals(user.getId())) {
+                ra.addFlashAttribute("error", "You do not have permission to view followups for this lead.");
+                return new ModelAndView("redirect:/view_filter_leads");
+            }
+        }
+        ModelAndView mv = new ModelAndView("leads/viewLeadFollowupDetails");
         mv.addObject("LEAD_OBJ", buildLeadDTO(lead));
 
         List<LeadFollowupVO> followups = new ArrayList<>();
@@ -267,6 +312,7 @@ public class LeadController {
 
         mv.addObject("FOLLOWUP_LIST", followups);
         mv.addObject("FOLLOWUP_OBJ", new LeadFollowupVO());
+        mv.addObject("CURRENT_USER", user);
         return mv;
     }
 
@@ -277,6 +323,12 @@ public class LeadController {
                                  RedirectAttributes ra) {
         User loggedIn = getLoggedInUser();
         Lead lead = leadService.findById(leadId);
+        if (loggedIn != null && !(loggedIn.hasRole("ADMIN") || loggedIn.hasRole("SUPERADMIN"))) {
+            if (lead.getAssignedTo() == null || !lead.getAssignedTo().equals(loggedIn.getId())) {
+                ra.addFlashAttribute("error", "You do not have permission to record followup for this lead.");
+                return "redirect:/view_filter_leads";
+            }
+        }
 
         LeadsFollowupEntity followup = new LeadsFollowupEntity();
         followup.setLeadEntity(lead);
@@ -304,6 +356,10 @@ public class LeadController {
             @RequestParam(required = false) String priority,
             HttpServletResponse response) throws IOException {
 
+        User user = getLoggedInUser();
+        if (user != null && !(user.hasRole("ADMIN") || user.hasRole("SUPERADMIN"))) {
+            assignedTo = user.getId();
+        }
         List<Lead> leads = leadService.filterLeadsList(leadStatus, leadSource, clientName, assignedTo, priority);
         Map<Long, String> usersMap = getActiveUsersMap();
 
@@ -370,6 +426,10 @@ public class LeadController {
             @RequestParam(required = false) String priority,
             HttpServletResponse response) throws IOException, DocumentException {
 
+        User user = getLoggedInUser();
+        if (user != null && !(user.hasRole("ADMIN") || user.hasRole("SUPERADMIN"))) {
+            assignedTo = user.getId();
+        }
         List<Lead> leads = leadService.filterLeadsList(leadStatus, leadSource, clientName, assignedTo, priority);
         Map<Long, String> usersMap = getActiveUsersMap();
 
