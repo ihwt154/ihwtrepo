@@ -83,6 +83,7 @@ public class NotificationService {
         props.put("mail.smtp.auth", "true");
         props.put("mail.smtp.starttls.enable", "true");
         props.put("mail.smtp.ssl.trust", host);
+        props.put("mail.debug", "true");
 
         // 1. Client Email Notification
         if (notifyEmail && clientActive && lead.getEmail() != null && !lead.getEmail().trim().isEmpty()) {
@@ -98,11 +99,15 @@ public class NotificationService {
                 String contactEmail = (config.getCentralizedEmail() != null && !config.getCentralizedEmail().trim().isEmpty())
                         ? config.getCentralizedEmail()
                         : (config.getEmailFromAddress() != null ? config.getEmailFromAddress() : "info@ihwtfederation.com");
-                String body = "<h3>Hello " + lead.getLeadName() + ",</h3>"
-                        + "<p>Thank you for reaching out to us. Your inquiry regarding \"" + (lead.getLeadTitle() != null ? lead.getLeadTitle() : "") + "\" has been successfully registered.</p>"
-                        + "<p>Our team will review your request and contact you shortly.</p>"
-                        + "<p>Best regards,<br/><strong>" + companyName + " Team</strong></p>"
-                        + "<p>Email: " + contactEmail + "<br/>Contact No.: " + phone + "</p>";
+                String body =
+                        "<p>Hello " + lead.getLeadName() + ",</p>"
+                                + "<p>Thank you for your interest in ETHEXPO Eurasia 2026, taking place in Istanbul from 25–28 November 2026.</p>"
+                                + "<p>Your inquiry has been received, and a member of our team will contact you within the next 24 hours to discuss participation opportunities.</p>"
+                                + "<p>For event information, please visit:<br/>"
+                                + "<a href='https://www.ihwtfederation.org'>www.ihwtfederation.org</a></p>"
+                                + "<p>We look forward to connecting with you soon.</p>"
+                                + "<p>Best regards,</p>"
+                                + "<p><strong>Team IHWT Federation | ETHEXPO Eurasia 2026</strong></p>";
 
                 helper.setText(body, true);
                 mailSender.send(message);
