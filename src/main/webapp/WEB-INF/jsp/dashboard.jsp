@@ -23,7 +23,10 @@
             </div>
             <div class="banner-right">
                 <h3><c:choose><c:when test="${not empty centralConfig.companyName}">${centralConfig.companyName}</c:when><c:otherwise>CRM</c:otherwise></c:choose></h3>
-                <span>★ ADMINISTRATOR VIEW</span>
+                <c:choose>
+                    <c:when test="${isAdmin}"><span>★ ADMINISTRATOR VIEW</span></c:when>
+                    <c:otherwise><span>★ MY DASHBOARD</span></c:otherwise>
+                </c:choose>
             </div>
         </section>
 
@@ -31,7 +34,7 @@
         <section class="bento-card">
             <div>
                 <div class="stats-header">
-                    <span>Total Leads</span>
+                    <c:choose><c:when test="${isAdmin}"><span>Total Leads</span></c:when><c:otherwise><span>My Leads</span></c:otherwise></c:choose>
                     <span class="stats-icon">📄</span>
                 </div>
                 <div class="stats-number">${totalLeads}</div>
@@ -135,7 +138,7 @@
 
         <!-- Lead Bar Chart Bento Box (2 Cols) -->
         <section class="bento-card bar-bento">
-            <h3 class="bento-card-title">All Leads - Status Breakdown</h3>
+            <h3 class="bento-card-title"><c:choose><c:when test="${isAdmin}">All Leads - Status Breakdown</c:when><c:otherwise>My Leads - Status Breakdown</c:otherwise></c:choose></h3>
             <div class="chart-wrapper" style="align-items: stretch;">
                 <c:choose>
                     <c:when test="${totalLeads > 0}">

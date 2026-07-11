@@ -80,10 +80,15 @@ public class ClientController {
         ClientEntity entity = buildEntityFromDTO(dto, null, loggedIn);
         clientService.saveClient(entity);
         ra.addFlashAttribute("success", "Client created successfully!");
-        return "redirect:view_clients_list";
+
+        // CLIENT_MANAGE (or ADMIN/SUPERADMIN) → full list
+        // CLIENT_CREATE only → their own clients list
+        boolean canManage = loggedIn != null &&
+                (loggedIn.hasRole("ADMIN") || loggedIn.hasRole("SUPERADMIN") || loggedIn.hasRole("CLIENT_MANAGE"));
+        return canManage ? "redirect:view_clients_list" : "redirect:view_my_clients";
     }
 
-    // ─── CLIENT LIST ─────────────────────────────────────────────────────────
+    // ─── CLIENT LIST (All — for CLIENT_MANAGE / ADMIN) ───────────────────────
     @GetMapping("view_clients_list")
     public ModelAndView viewClientList(
             @RequestParam(defaultValue = "0") int page,
@@ -92,8 +97,17 @@ public class ClientController {
             @RequestParam(required = false) Boolean active,
             @RequestParam(required = false) String city) {
 
+        User user = getLoggedInUser();
+        // Only ADMIN / SUPERADMIN / CLIENT_MANAGE roles see all clients
+        boolean canManageAll = user != null &&
+                (user.hasRole("ADMIN") || user.hasRole("SUPERADMIN") || user.hasRole("CLIENT_MANAGE"));
+        // CLIENT_CREATE-only users who somehow navigate here are redirected to their own list
+        if (!canManageAll) {
+            return new ModelAndView("redirect:/view_my_clients");
+        }
+
         ModelAndView mv = new ModelAndView("admin/client/viewClientListing");
-        Page<ClientEntity> paged = clientService.filterClients(clientName, active, city,
+        Page<ClientEntity> paged = clientService.filterClients(clientName, active, city, null,
                 PageRequest.of(page, pageSize));
 
         List<ClientDTO> dtoList = new ArrayList<>();
@@ -111,6 +125,49 @@ public class ClientController {
         mv.addObject("f_city", city);
         mv.addObject("CLIENT_STATUSES", CLIENT_STATUSES);
         mv.addObject("CITIES", cityRepository.findAll());
+        mv.addObject("MY_CLIENTS_ONLY", false);
+        return mv;
+    }
+
+    // ─── MY CLIENT LIST (Scoped — for CLIENT_CREATE only users) ──────────────
+    @GetMapping("view_my_clients")
+    public ModelAndView viewMyClientList(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int pageSize,
+            @RequestParam(required = false) String clientName,
+            @RequestParam(required = false) Boolean active,
+            @RequestParam(required = false) String city) {
+
+        User user = getLoggedInUser();
+        // If the user has full manage permission, just redirect them to the full list
+        boolean canManageAll = user != null &&
+                (user.hasRole("ADMIN") || user.hasRole("SUPERADMIN") || user.hasRole("CLIENT_MANAGE"));
+        if (canManageAll) {
+            return new ModelAndView("redirect:/view_clients_list");
+        }
+
+        Long createdBy = (user != null) ? user.getId() : null;
+
+        ModelAndView mv = new ModelAndView("admin/client/viewClientListing");
+        Page<ClientEntity> paged = clientService.filterClients(clientName, active, city, createdBy,
+                PageRequest.of(page, pageSize));
+
+        List<ClientDTO> dtoList = new ArrayList<>();
+        for (ClientEntity e : paged.getContent()) {
+            dtoList.add(new ClientDTO(e));
+        }
+
+        mv.addObject("CLIENT_LIST", dtoList);
+        mv.addObject("currentPage", page);
+        mv.addObject("totalPages", paged.getTotalPages());
+        mv.addObject("totalClients", paged.getTotalElements());
+        mv.addObject("pageSize", pageSize);
+        mv.addObject("f_clientName", clientName);
+        mv.addObject("f_active", active);
+        mv.addObject("f_city", city);
+        mv.addObject("CLIENT_STATUSES", CLIENT_STATUSES);
+        mv.addObject("CITIES", cityRepository.findAll());
+        mv.addObject("MY_CLIENTS_ONLY", true); // flag so JSP can adapt labels/links
         return mv;
     }
 
@@ -150,7 +207,9 @@ public class ClientController {
         buildEntityFromDTO(dto, existing, loggedIn);
         clientService.saveClient(existing);
         ra.addFlashAttribute("success", "Client updated successfully!");
-        return "redirect:view_clients_list";
+        boolean canManage = loggedIn != null &&
+                (loggedIn.hasRole("ADMIN") || loggedIn.hasRole("SUPERADMIN") || loggedIn.hasRole("CLIENT_MANAGE"));
+        return canManage ? "redirect:view_clients_list" : "redirect:view_my_clients";
     }
 
     // ─── TOGGLE ACTIVE ───────────────────────────────────────────────────────
@@ -158,7 +217,10 @@ public class ClientController {
     public String toggleClient(@RequestParam Long clientId, RedirectAttributes ra) {
         clientService.toggleActive(clientId);
         ra.addFlashAttribute("success", "Client status updated.");
-        return "redirect:view_clients_list";
+        User loggedIn = getLoggedInUser();
+        boolean canManage = loggedIn != null &&
+                (loggedIn.hasRole("ADMIN") || loggedIn.hasRole("SUPERADMIN") || loggedIn.hasRole("CLIENT_MANAGE"));
+        return canManage ? "redirect:view_clients_list" : "redirect:view_my_clients";
     }
 
     // ─── EXPORT EXCEL ────────────────────────────────────────────────────────
@@ -169,7 +231,11 @@ public class ClientController {
             @RequestParam(required = false) String city,
             HttpServletResponse response) throws IOException {
 
-        List<ClientEntity> clients = clientService.filterClientsList(clientName, active, city);
+        User user = getLoggedInUser();
+        boolean canManageAll = user != null &&
+                (user.hasRole("ADMIN") || user.hasRole("SUPERADMIN") || user.hasRole("CLIENT_MANAGE"));
+        Long createdBy = canManageAll ? null : (user != null ? user.getId() : null);
+        List<ClientEntity> clients = clientService.filterClientsList(clientName, active, city, createdBy);
 
         Workbook workbook = new XSSFWorkbook();
         Sheet sheet = workbook.createSheet("Clients");
@@ -229,7 +295,11 @@ public class ClientController {
             @RequestParam(required = false) String city,
             HttpServletResponse response) throws IOException, DocumentException {
 
-        List<ClientEntity> clients = clientService.filterClientsList(clientName, active, city);
+        User user = getLoggedInUser();
+        boolean canManageAll = user != null &&
+                (user.hasRole("ADMIN") || user.hasRole("SUPERADMIN") || user.hasRole("CLIENT_MANAGE"));
+        Long createdBy = canManageAll ? null : (user != null ? user.getId() : null);
+        List<ClientEntity> clients = clientService.filterClientsList(clientName, active, city, createdBy);
 
         Document document = new Document(PageSize.A4.rotate());
         response.setContentType("application/pdf");

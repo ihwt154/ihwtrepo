@@ -43,7 +43,12 @@
 <jsp:include page="/WEB-INF/jsp/header.jsp"/>
 <div class="page-container" style="padding:30px;">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
-        <h2 style="font-size:1.5rem;font-weight:700;color:var(--text-primary);">Manage Clients</h2>
+        <h2 style="font-size:1.5rem;font-weight:700;color:var(--text-primary);">
+            <c:choose>
+                <c:when test="${MY_CLIENTS_ONLY}">My Clients</c:when>
+                <c:otherwise>Manage Clients</c:otherwise>
+            </c:choose>
+        </h2>
         <a href="${pageContext.request.contextPath}/view_add_client_form"
            style="padding:10px 20px;background:var(--accent-primary);color:#fff;border-radius:8px;text-decoration:none;font-weight:600;">+ Add Client</a>
     </div>
@@ -53,7 +58,7 @@
 
     <%-- Filter Form --%>
     <div style="background:rgba(255,255,255,0.85);border-radius:14px;padding:20px 24px;box-shadow:0 2px 12px rgba(0,0,0,0.06);margin-bottom:20px;">
-        <form method="get" action="${pageContext.request.contextPath}/view_clients_list"
+    <form method="get" action="${pageContext.request.contextPath}/${MY_CLIENTS_ONLY ? 'view_my_clients' : 'view_clients_list'}"
               style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;align-items:end;">
             <div>
                 <label style="font-size:0.8rem;font-weight:600;color:#64748b;display:block;margin-bottom:4px;">Client Name</label>
@@ -93,7 +98,7 @@
             </div>
             <div style="display:flex;gap:8px;">
                 <button type="submit" style="padding:8px 16px;background:var(--accent-primary);color:#fff;border:none;border-radius:8px;cursor:pointer;font-weight:600;flex:1;">Filter</button>
-                <a href="${pageContext.request.contextPath}/view_clients_list"
+                <a href="${pageContext.request.contextPath}/${MY_CLIENTS_ONLY ? 'view_my_clients' : 'view_clients_list'}"
                    style="padding:8px 14px;background:#f1f5f9;color:#475569;border-radius:8px;text-decoration:none;display:flex;align-items:center;">Reset</a>
             </div>
         </form>
@@ -159,6 +164,7 @@
     </div>
 
     <c:if test="${totalPages > 1}">
+        <c:set var="listBase" value="${MY_CLIENTS_ONLY ? 'view_my_clients' : 'view_clients_list'}"/>
         <div style="display:flex;gap:8px;margin-top:20px;justify-content:center;">
             <c:if test="${currentPage > 0}">
                 <a href="?page=${currentPage-1}&pageSize=${pageSize}&clientName=${f_clientName}&city=${f_city}&active=${f_active}"

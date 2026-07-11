@@ -8,4 +8,10 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface LeadRepository extends JpaRepository<Lead, Long>, JpaSpecificationExecutor<Lead> {
     long countByLeadStatus(String leadStatus);
+
+    // For user-scoped dashboard: count all leads assigned to a specific user
+    long countByAssignedTo(Long assignedTo);
+
+    // For user-scoped dashboard: count leads by status AND assigned user
+    long countByLeadStatusAndAssignedTo(String leadStatus, Long assignedTo);
 }

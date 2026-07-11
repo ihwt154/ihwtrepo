@@ -44,7 +44,7 @@ public class ClientService {
         return clientRepository.existsByMobileAndClientIdNot(mobile, clientId);
     }
 
-    public Page<ClientEntity> filterClients(String clientName, Boolean active, String city, Pageable pageable) {
+    public Page<ClientEntity> filterClients(String clientName, Boolean active, String city, Long createdBy, Pageable pageable) {
         Specification<ClientEntity> spec = (root, query, cb) -> {
             List<Predicate> predicates = new ArrayList<>();
             if (clientName != null && !clientName.trim().isEmpty()) {
@@ -60,13 +60,17 @@ public class ClientService {
                 } catch (NumberFormatException e) {
                     predicates.add(cb.like(cb.lower(root.get("city").get("name")), "%" + city.toLowerCase() + "%"));
                 }
+            }
+            // Scope to only clients created by this user (for CLIENT_CREATE-only users)
+            if (createdBy != null) {
+                predicates.add(cb.equal(root.get("createdBy"), createdBy));
             }
             return cb.and(predicates.toArray(new Predicate[0]));
         };
         return clientRepository.findAll(spec, pageable);
     }
 
-    public List<ClientEntity> filterClientsList(String clientName, Boolean active, String city) {
+    public List<ClientEntity> filterClientsList(String clientName, Boolean active, String city, Long createdBy) {
         Specification<ClientEntity> spec = (root, query, cb) -> {
             List<Predicate> predicates = new ArrayList<>();
             if (clientName != null && !clientName.trim().isEmpty()) {
@@ -82,6 +86,10 @@ public class ClientService {
                 } catch (NumberFormatException e) {
                     predicates.add(cb.like(cb.lower(root.get("city").get("name")), "%" + city.toLowerCase() + "%"));
                 }
+            }
+            // Scope to only clients created by this user (for CLIENT_CREATE-only users)
+            if (createdBy != null) {
+                predicates.add(cb.equal(root.get("createdBy"), createdBy));
             }
             return cb.and(predicates.toArray(new Predicate[0]));
         };

@@ -42,17 +42,33 @@ public class LoginController {
         if (principal == null) {
             return "redirect:/login";
         }
-        
-        // Fetch dynamic counts from the database using real status values
-        long totalLeads = leadRepository.count();
-        long totalClients = clientRepository.count();
-        long totalUsers = userRepository.count();
 
-        // Real status strings from WorkloadStatusService fallback
-        long openLeads       = leadRepository.countByLeadStatus("Open");
-        long wipLeads        = leadRepository.countByLeadStatus("Work In Progress");
-        long wonLeads        = leadRepository.countByLeadStatus("Won-Converted");
-        long failedLeads     = leadRepository.countByLeadStatus("Failed-Closed");
+        // Determine if the logged-in user is an admin/superadmin
+        com.ihwthms.entity.User loggedInUser = userRepository.findByUsername(principal.getName()).orElse(null);
+        boolean isAdmin = loggedInUser != null &&
+                (loggedInUser.hasRole("ADMIN") || loggedInUser.hasRole("SUPERADMIN"));
+
+        long totalLeads, openLeads, wipLeads, wonLeads, failedLeads;
+
+        if (isAdmin || loggedInUser == null) {
+            // Admin sees ALL leads
+            totalLeads   = leadRepository.count();
+            openLeads    = leadRepository.countByLeadStatus("Open");
+            wipLeads     = leadRepository.countByLeadStatus("Work In Progress");
+            wonLeads     = leadRepository.countByLeadStatus("Won-Converted");
+            failedLeads  = leadRepository.countByLeadStatus("Failed-Closed");
+        } else {
+            // Regular user sees ONLY their own assigned leads
+            Long userId = loggedInUser.getId();
+            totalLeads   = leadRepository.countByAssignedTo(userId);
+            openLeads    = leadRepository.countByLeadStatusAndAssignedTo("Open", userId);
+            wipLeads     = leadRepository.countByLeadStatusAndAssignedTo("Work In Progress", userId);
+            wonLeads     = leadRepository.countByLeadStatusAndAssignedTo("Won-Converted", userId);
+            failedLeads  = leadRepository.countByLeadStatusAndAssignedTo("Failed-Closed", userId);
+        }
+
+        long totalClients = clientRepository.count();
+        long totalUsers   = userRepository.count();
 
         long sumForDonut = openLeads + wipLeads + wonLeads + failedLeads;
         long openPercent   = sumForDonut > 0 ? Math.round((double) openLeads   / sumForDonut * 100) : 0;
@@ -63,6 +79,7 @@ public class LoginController {
         model.addAttribute("totalLeads",    totalLeads);
         model.addAttribute("totalClients",  totalClients);
         model.addAttribute("totalUsers",    totalUsers);
+        model.addAttribute("isAdmin",       isAdmin);
 
         model.addAttribute("openLeads",    openLeads);
         model.addAttribute("wipLeads",     wipLeads);
