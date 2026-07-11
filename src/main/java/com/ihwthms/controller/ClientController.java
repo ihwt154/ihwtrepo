@@ -57,12 +57,18 @@ public class ClientController {
     // ─── ADD CLIENT FORM ─────────────────────────────────────────────────────
     @GetMapping("view_add_client_form")
     public ModelAndView viewAddClientForm() {
+        User loggedIn = getLoggedInUser();
+        boolean canManage = loggedIn != null &&
+                (loggedIn.hasRole("ADMIN") || loggedIn.hasRole("SUPERADMIN") || loggedIn.hasRole("CLIENT_MANAGE"));
+        String clientListUrl = canManage ? "view_clients_list" : "view_my_clients";
+
         ModelAndView mv = new ModelAndView("admin/client/Admin_Add_Client");
         mv.addObject("CLIENT_OBJ", new ClientDTO());
         mv.addObject("CLIENT_STATUSES", CLIENT_STATUSES);
         mv.addObject("CLIENT_SOURCES", clientSourceService.findAllActive());
         mv.addObject("CLIENT_TYPES", clientTypeService.findAllActive());
         mv.addObject("CITIES", cityRepository.findAll());
+        mv.addObject("CLIENT_LIST_URL", clientListUrl);
         return mv;
     }
 
@@ -174,15 +180,26 @@ public class ClientController {
     // ─── VIEW CLIENT DETAILS ─────────────────────────────────────────────────
     @GetMapping("view_client_details")
     public ModelAndView viewClientDetails(@RequestParam Long clientId) {
+        User loggedIn = getLoggedInUser();
+        boolean canManage = loggedIn != null &&
+                (loggedIn.hasRole("ADMIN") || loggedIn.hasRole("SUPERADMIN") || loggedIn.hasRole("CLIENT_MANAGE"));
+        String clientListUrl = canManage ? "view_clients_list" : "view_my_clients";
+
         ModelAndView mv = new ModelAndView("admin/client/Admin_View_Client");
         ClientEntity entity = clientService.findById(clientId);
         mv.addObject("CLIENT_OBJ", new ClientDTO(entity));
+        mv.addObject("CLIENT_LIST_URL", clientListUrl);
         return mv;
     }
 
     // ─── EDIT CLIENT FORM ────────────────────────────────────────────────────
     @GetMapping("view_edit_client_form")
     public ModelAndView viewEditClientForm(@RequestParam Long clientId) {
+        User loggedIn = getLoggedInUser();
+        boolean canManage = loggedIn != null &&
+                (loggedIn.hasRole("ADMIN") || loggedIn.hasRole("SUPERADMIN") || loggedIn.hasRole("CLIENT_MANAGE"));
+        String clientListUrl = canManage ? "view_clients_list" : "view_my_clients";
+
         ModelAndView mv = new ModelAndView("admin/client/Admin_Edit_Client");
         ClientEntity entity = clientService.findById(clientId);
         mv.addObject("CLIENT_OBJ", new ClientDTO(entity));
@@ -190,6 +207,7 @@ public class ClientController {
         mv.addObject("CLIENT_SOURCES", clientSourceService.findAllActive());
         mv.addObject("CLIENT_TYPES", clientTypeService.findAllActive());
         mv.addObject("CITIES", cityRepository.findAll());
+        mv.addObject("CLIENT_LIST_URL", clientListUrl);
         return mv;
     }
 

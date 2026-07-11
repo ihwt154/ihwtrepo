@@ -17,7 +17,7 @@
         <h2 style="font-size:1.5rem;font-weight:700;color:var(--text-primary);">Client Details</h2>
         <div style="display:flex;gap:10px;">
             <a href="${pageContext.request.contextPath}/view_edit_client_form?clientId=${CLIENT_OBJ.clientId}" style="padding:9px 18px;background:var(--accent-primary);color:#fff;border-radius:8px;text-decoration:none;font-weight:600;">Edit</a>
-            <a href="${pageContext.request.contextPath}/view_clients_list" style="padding:9px 18px;background:#f1f5f9;color:#475569;border-radius:8px;text-decoration:none;">Back</a>
+            <a href="${pageContext.request.contextPath}/${CLIENT_LIST_URL}" style="padding:9px 18px;background:#f1f5f9;color:#475569;border-radius:8px;text-decoration:none;">Back</a>
         </div>
     </div>
 

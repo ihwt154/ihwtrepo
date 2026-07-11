@@ -14,7 +14,7 @@
 <div class="page-container" style="padding:30px; max-width:800px; margin:0 auto;">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;">
         <h2 style="font-size:1.5rem;font-weight:700;color:var(--text-primary);">Edit Client</h2>
-        <a href="${pageContext.request.contextPath}/view_clients_list" style="padding:9px 18px;background:#f1f5f9;color:#475569;border-radius:8px;text-decoration:none;">Back</a>
+        <a href="${pageContext.request.contextPath}/${CLIENT_LIST_URL}" style="padding:9px 18px;background:#f1f5f9;color:#475569;border-radius:8px;text-decoration:none;">Back</a>
     </div>
     <c:if test="${not empty error}"><div style="background:#fee2e2;color:#991b1b;padding:12px;border-radius:8px;margin-bottom:16px;">${error}</div></c:if>
 
@@ -127,7 +127,7 @@
                 <textarea name="remarks" rows="3" style="width:100%;padding:10px;border:1px solid #e2e8f0;border-radius:8px;resize:vertical;">${CLIENT_OBJ.remarks}</textarea>
             </div>
             <div style="display:flex;gap:12px;justify-content:flex-end;">
-                <a href="${pageContext.request.contextPath}/view_clients_list" style="padding:10px 24px;background:#f1f5f9;color:#475569;border-radius:8px;text-decoration:none;">Cancel</a>
+                <a href="${pageContext.request.contextPath}/${CLIENT_LIST_URL}" style="padding:10px 24px;background:#f1f5f9;color:#475569;border-radius:8px;text-decoration:none;">Cancel</a>
                 <button type="submit" style="padding:10px 28px;background:var(--accent-primary);color:#fff;border:none;border-radius:8px;cursor:pointer;font-weight:600;">Update Client</button>
             </div>
         </form>
