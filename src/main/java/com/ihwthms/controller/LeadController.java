@@ -43,12 +43,18 @@ import com.itextpdf.text.pdf.PdfWriter;
 @Controller
 public class LeadController {
 
-    @Autowired private LeadService leadService;
-    @Autowired private ClientService clientService;
-    @Autowired private UserRepository userRepository;
-    @Autowired private WorkloadStatusService workloadStatusService;
-    @Autowired private ClientSourceService clientSourceService;
-    @Autowired private NotificationService notificationService;
+    @Autowired
+    private LeadService leadService;
+    @Autowired
+    private ClientService clientService;
+    @Autowired
+    private UserRepository userRepository;
+    @Autowired
+    private WorkloadStatusService workloadStatusService;
+    @Autowired
+    private ClientSourceService clientSourceService;
+    @Autowired
+    private NotificationService notificationService;
 
     private static final DateTimeFormatter DTF = DateTimeFormatter.ofPattern("dd/MMM/yyyy HH:mm");
 
@@ -81,7 +87,7 @@ public class LeadController {
     // ─── CREATE LEAD ─────────────────────────────────────────────────────────
     @PostMapping("/create_lead")
     public String createLead(@ModelAttribute("LEAD_OBJ") LeadDTO dto,
-                             RedirectAttributes ra) {
+            RedirectAttributes ra) {
         // Validate client selection
         if (dto.getClientId() == null || dto.getClientId() <= 0) {
             ra.addFlashAttribute("error", "Please select a valid client before creating a lead.");
@@ -137,7 +143,8 @@ public class LeadController {
         lead.setCity(client.getCity());
         lead.setCountry(client.getCountry());
 
-        // Auto-populate organisation fields from the linked client (stored in DB, not shown on form)
+        // Auto-populate organisation fields from the linked client (stored in DB, not
+        // shown on form)
         lead.setOrganizationName(client.getOrganizationName());
         lead.setOrganizationType(client.getOrganizationType());
         lead.setRegistrationNumber(client.getRegistrationNumber());
@@ -166,11 +173,13 @@ public class LeadController {
             @RequestParam(required = false) Long assignedTo,
             @RequestParam(required = false) String priority) {
 
-        // Enforce lead visibility based on user role
+        // ADMIN / SUPERADMIN / LEADS_MANAGE → see ALL leads
+        // LEADS_CREATE only → redirect to /view_my_leads
         User user = getLoggedInUser();
-        if (user != null && !(user.hasRole("ADMIN") || user.hasRole("SUPERADMIN"))) {
-            // Regular users see ONLY their own leads
-            assignedTo = user.getId();
+        boolean canManageAll = user != null &&
+                (user.hasRole("ADMIN") || user.hasRole("SUPERADMIN") || user.hasRole("LEADS_MANAGE"));
+        if (!canManageAll) {
+            return new ModelAndView("redirect:/view_my_leads");
         }
 
         ModelAndView mv = new ModelAndView("leads/view_filterLeads");
@@ -182,12 +191,12 @@ public class LeadController {
             dtoList.add(buildLeadDTO(lead));
         }
 
-
         String statusJoined = "";
         if (leadStatus != null && !leadStatus.isEmpty()) {
             List<String> activeList = new java.util.ArrayList<>();
             for (String s : leadStatus) {
-                if (s != null && !s.trim().isEmpty()) activeList.add(s.trim());
+                if (s != null && !s.trim().isEmpty())
+                    activeList.add(s.trim());
             }
             statusJoined = String.join(",", activeList);
         }
@@ -208,6 +217,65 @@ public class LeadController {
         mv.addObject("f_assignedTo", assignedTo);
         mv.addObject("f_priority", priority);
         mv.addObject("CURRENT_USER", user);
+        mv.addObject("MY_LEADS_ONLY", false);
+        return mv;
+    }
+
+    // ─── MY LEADS (Scoped — for LEADS_CREATE users) ──────────────────────────
+    @GetMapping("/view_my_leads")
+    public ModelAndView viewMyLeads(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int pageSize,
+            @RequestParam(required = false) List<String> leadStatus,
+            @RequestParam(required = false) String leadSource,
+            @RequestParam(required = false) String clientName,
+            @RequestParam(required = false) String priority) {
+
+        User user = getLoggedInUser();
+        if (user == null || !(user.hasRole("ADMIN") || user.hasRole("SUPERADMIN")
+                || user.hasRole("LEADS_CREATE") || user.hasRole("LEADS_MANAGE"))) {
+            return new ModelAndView("redirect:/dashboard");
+        }
+
+        // Always scope to the current user's own leads
+        Long assignedTo = user.getId();
+
+        ModelAndView mv = new ModelAndView("leads/view_filterLeads");
+        Page<Lead> pagedLeads = leadService.filterLeads(page, pageSize, leadStatus,
+                leadSource, clientName, assignedTo, priority);
+
+        List<LeadDTO> dtoList = new ArrayList<>();
+        for (Lead lead : pagedLeads.getContent()) {
+            dtoList.add(buildLeadDTO(lead));
+        }
+
+        String statusJoined = "";
+        if (leadStatus != null && !leadStatus.isEmpty()) {
+            List<String> activeList = new java.util.ArrayList<>();
+            for (String s : leadStatus) {
+                if (s != null && !s.trim().isEmpty())
+                    activeList.add(s.trim());
+            }
+            statusJoined = String.join(",", activeList);
+        }
+
+        mv.addObject("LEADS_LIST", dtoList);
+        mv.addObject("currentPage", page);
+        mv.addObject("totalPages", pagedLeads.getTotalPages());
+        mv.addObject("totalLeads", pagedLeads.getTotalElements());
+        mv.addObject("pageSize", pageSize);
+        mv.addObject("ACTIVE_USERS_MAP", getActiveUsersMap());
+        mv.addObject("LEAD_STATUSES", workloadStatusService.getActiveLeadStatuses());
+        mv.addObject("PRIORITIES", PRIORITIES);
+        mv.addObject("CLIENT_SOURCES", clientSourceService.findAllActive());
+        mv.addObject("f_leadStatus", leadStatus);
+        mv.addObject("f_leadStatusString", statusJoined);
+        mv.addObject("f_leadSource", leadSource);
+        mv.addObject("f_clientName", clientName);
+        mv.addObject("f_assignedTo", assignedTo);
+        mv.addObject("f_priority", priority);
+        mv.addObject("CURRENT_USER", user);
+        mv.addObject("MY_LEADS_ONLY", true);
         return mv;
     }
 
@@ -252,7 +320,7 @@ public class LeadController {
     // ─── UPDATE LEAD ─────────────────────────────────────────────────────────
     @PostMapping("/edit_lead")
     public String editLead(@ModelAttribute("LEAD_OBJ") LeadDTO dto,
-                           RedirectAttributes ra) {
+            RedirectAttributes ra) {
         User loggedIn = getLoggedInUser();
         Lead lead = leadService.findById(dto.getLeadId());
         if (loggedIn != null && !(loggedIn.hasRole("ADMIN") || loggedIn.hasRole("SUPERADMIN"))) {
@@ -305,7 +373,8 @@ public class LeadController {
                 vo.setFormattedNextFollowupTime(f.getNextfollowuptime().format(DTF));
             if (f.getUpdatedBy() != null) {
                 Optional<User> u = userRepository.findById(f.getUpdatedBy());
-                if (u.isPresent()) vo.setUpdatedByName(u.get().getUsername());
+                if (u.isPresent())
+                    vo.setUpdatedByName(u.get().getUsername());
             }
             followups.add(vo);
         }
@@ -319,8 +388,8 @@ public class LeadController {
     // ─── SAVE FOLLOWUP ───────────────────────────────────────────────────────
     @PostMapping("/create_lead_followup")
     public String createFollowup(@RequestParam Long leadId,
-                                 @ModelAttribute("FOLLOWUP_OBJ") LeadFollowupVO vo,
-                                 RedirectAttributes ra) {
+            @ModelAttribute("FOLLOWUP_OBJ") LeadFollowupVO vo,
+            RedirectAttributes ra) {
         User loggedIn = getLoggedInUser();
         Lead lead = leadService.findById(leadId);
         if (loggedIn != null && !(loggedIn.hasRole("ADMIN") || loggedIn.hasRole("SUPERADMIN"))) {
@@ -379,7 +448,8 @@ public class LeadController {
         headerCellStyle.setAlignment(HorizontalAlignment.CENTER);
 
         Row headerRow = sheet.createRow(0);
-        String[] columns = {"ID", "Lead Title", "Lead Name", "Client", "Mobile", "City", "Status", "Source", "Event Name", "Priority", "Assigned To"};
+        String[] columns = { "ID", "Lead Title", "Lead Name", "Client", "Mobile", "City", "Status", "Source",
+                "Event Name", "Priority", "Assigned To" };
         for (int i = 0; i < columns.length; i++) {
             Cell cell = headerRow.createCell(i);
             cell.setCellValue(columns[i]);
@@ -452,7 +522,8 @@ public class LeadController {
         table.setSpacingAfter(10f);
 
         com.itextpdf.text.Font pdfHeaderFont = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 10, BaseColor.WHITE);
-        String[] headers = {"ID", "Lead Title", "Lead Name", "Client", "Mobile", "City", "Status", "Source", "Event Name", "Priority", "Assigned To"};
+        String[] headers = { "ID", "Lead Title", "Lead Name", "Client", "Mobile", "City", "Status", "Source",
+                "Event Name", "Priority", "Assigned To" };
         for (String h : headers) {
             PdfPCell headerCell = new PdfPCell(new Phrase(h, pdfHeaderFont));
             headerCell.setBackgroundColor(new BaseColor(15, 23, 42));
@@ -466,8 +537,10 @@ public class LeadController {
             table.addCell(new PdfPCell(new Phrase(String.valueOf(lead.getId() != null ? lead.getId() : 0), dataFont)));
             table.addCell(new PdfPCell(new Phrase(lead.getLeadTitle() != null ? lead.getLeadTitle() : "", dataFont)));
             table.addCell(new PdfPCell(new Phrase(lead.getLeadName() != null ? lead.getLeadName() : "", dataFont)));
-            table.addCell(new PdfPCell(new Phrase(lead.getClient() != null ? lead.getClient().getClientName() : "", dataFont)));
-            table.addCell(new PdfPCell(new Phrase(lead.getMobileNumber() != null ? lead.getMobileNumber() : "", dataFont)));
+            table.addCell(new PdfPCell(
+                    new Phrase(lead.getClient() != null ? lead.getClient().getClientName() : "", dataFont)));
+            table.addCell(
+                    new PdfPCell(new Phrase(lead.getMobileNumber() != null ? lead.getMobileNumber() : "", dataFont)));
             table.addCell(new PdfPCell(new Phrase(lead.getCity() != null ? lead.getCity().getName() : "", dataFont)));
             table.addCell(new PdfPCell(new Phrase(lead.getLeadStatus() != null ? lead.getLeadStatus() : "", dataFont)));
             table.addCell(new PdfPCell(new Phrase(lead.getLeadSource() != null ? lead.getLeadSource() : "", dataFont)));
@@ -495,21 +568,21 @@ public class LeadController {
                 : clientService.searchByName(clientName);
         for (ClientEntity c : clients) {
             Map<String, Object> m = new HashMap<>();
-            m.put("clientId",           c.getClientId());
-            m.put("clientName",         c.getClientName());
-            m.put("mobile",             c.getMobile());
-            m.put("emailId",            c.getEmailId());
-            m.put("city",               c.getCity() != null ? c.getCity().getName() : "");
-            m.put("country",            c.getCountry());
-            m.put("organizationName",   c.getOrganizationName());
-            m.put("organizationType",   c.getOrganizationType());
+            m.put("clientId", c.getClientId());
+            m.put("clientName", c.getClientName());
+            m.put("mobile", c.getMobile());
+            m.put("emailId", c.getEmailId());
+            m.put("city", c.getCity() != null ? c.getCity().getName() : "");
+            m.put("country", c.getCountry());
+            m.put("organizationName", c.getOrganizationName());
+            m.put("organizationType", c.getOrganizationType());
             m.put("registrationNumber", c.getRegistrationNumber());
-            m.put("website",            c.getWebsite());
-            m.put("address",            c.getAddress());
-            m.put("postalCode",         c.getPostalCode());
-            m.put("designation",        c.getDesignation());
-            m.put("clientType",         c.getClientType());
-            m.put("clientSource",       c.getClientSource());
+            m.put("website", c.getWebsite());
+            m.put("address", c.getAddress());
+            m.put("postalCode", c.getPostalCode());
+            m.put("designation", c.getDesignation());
+            m.put("clientType", c.getClientType());
+            m.put("clientSource", c.getClientSource());
             result.add(m);
         }
         return result;
@@ -527,7 +600,8 @@ public class LeadController {
         lead.setRemarks(dto.getRemarks());
         lead.setIsActive(dto.getIsActive() != null ? dto.getIsActive() : Boolean.TRUE);
         if (loggedIn != null) {
-            if (lead.getId() == null) lead.setCreatedBy(loggedIn.getId());
+            if (lead.getId() == null)
+                lead.setCreatedBy(loggedIn.getId());
             lead.setUpdatedBy(loggedIn.getId());
         }
     }
@@ -536,7 +610,8 @@ public class LeadController {
         LeadDTO dto = new LeadDTO(lead);
         if (lead.getAssignedTo() != null) {
             Optional<User> u = userRepository.findById(lead.getAssignedTo());
-            if (u.isPresent()) dto.setAssignedToName(u.get().getUsername());
+            if (u.isPresent())
+                dto.setAssignedToName(u.get().getUsername());
         }
         return dto;
     }

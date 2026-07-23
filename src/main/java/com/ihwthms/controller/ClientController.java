@@ -40,11 +40,16 @@ import com.itextpdf.text.pdf.PdfWriter;
 @Controller
 public class ClientController {
 
-    @Autowired private ClientService clientService;
-    @Autowired private UserRepository userRepository;
-    @Autowired private ClientSourceService clientSourceService;
-    @Autowired private ClientTypeService clientTypeService;
-    @Autowired private CityRepository cityRepository;
+    @Autowired
+    private ClientService clientService;
+    @Autowired
+    private UserRepository userRepository;
+    @Autowired
+    private ClientSourceService clientSourceService;
+    @Autowired
+    private ClientTypeService clientTypeService;
+    @Autowired
+    private CityRepository cityRepository;
 
     private static final List<String> CLIENT_STATUSES = Arrays.asList(
             "Active", "Inactive");
@@ -58,6 +63,13 @@ public class ClientController {
     @GetMapping("view_add_client_form")
     public ModelAndView viewAddClientForm() {
         User loggedIn = getLoggedInUser();
+        boolean hasAccess = loggedIn != null &&
+                (loggedIn.hasRole("ADMIN") || loggedIn.hasRole("SUPERADMIN") || loggedIn.hasRole("CLIENT_MANAGE")
+                        || loggedIn.hasRole("CLIENT_CREATE"));
+        if (!hasAccess) {
+            return new ModelAndView("redirect:/dashboard");
+        }
+
         boolean canManage = loggedIn != null &&
                 (loggedIn.hasRole("ADMIN") || loggedIn.hasRole("SUPERADMIN") || loggedIn.hasRole("CLIENT_MANAGE"));
         String clientListUrl = canManage ? "view_clients_list" : "view_my_clients";
@@ -75,7 +87,7 @@ public class ClientController {
     // ─── CREATE CLIENT ───────────────────────────────────────────────────────
     @PostMapping("create_client")
     public String createClient(@ModelAttribute("CLIENT_OBJ") ClientDTO dto,
-                               RedirectAttributes ra) {
+            RedirectAttributes ra) {
         if (dto.getMobile() != null && !dto.getMobile().trim().isEmpty()
                 && clientService.isMobileExists(dto.getMobile())) {
             ra.addFlashAttribute("error", "A client with this mobile number already exists.");
@@ -83,14 +95,20 @@ public class ClientController {
         }
 
         User loggedIn = getLoggedInUser();
+        if (loggedIn == null || !(loggedIn.hasRole("ADMIN") || loggedIn.hasRole("SUPERADMIN")
+                || loggedIn.hasRole("CLIENT_MANAGE") || loggedIn.hasRole("CLIENT_CREATE"))) {
+            ra.addFlashAttribute("error", "You do not have permission to create clients.");
+            return "redirect:/dashboard";
+        }
+
         ClientEntity entity = buildEntityFromDTO(dto, null, loggedIn);
         clientService.saveClient(entity);
         ra.addFlashAttribute("success", "Client created successfully!");
 
         // CLIENT_MANAGE (or ADMIN/SUPERADMIN) → full list
         // CLIENT_CREATE only → their own clients list
-        boolean canManage = loggedIn != null &&
-                (loggedIn.hasRole("ADMIN") || loggedIn.hasRole("SUPERADMIN") || loggedIn.hasRole("CLIENT_MANAGE"));
+        boolean canManage = loggedIn.hasRole("ADMIN") || loggedIn.hasRole("SUPERADMIN")
+                || loggedIn.hasRole("CLIENT_MANAGE");
         return canManage ? "redirect:view_clients_list" : "redirect:view_my_clients";
     }
 
@@ -107,7 +125,8 @@ public class ClientController {
         // Only ADMIN / SUPERADMIN / CLIENT_MANAGE roles see all clients
         boolean canManageAll = user != null &&
                 (user.hasRole("ADMIN") || user.hasRole("SUPERADMIN") || user.hasRole("CLIENT_MANAGE"));
-        // CLIENT_CREATE-only users who somehow navigate here are redirected to their own list
+        // CLIENT_CREATE-only users who somehow navigate here are redirected to their
+        // own list
         if (!canManageAll) {
             return new ModelAndView("redirect:/view_my_clients");
         }
@@ -135,7 +154,7 @@ public class ClientController {
         return mv;
     }
 
-    // ─── MY CLIENT LIST (Scoped — for CLIENT_CREATE only users) ──────────────
+    // ─── MY CLIENT LIST (Scoped — for CLIENT_CREATE users) ───────────────────
     @GetMapping("view_my_clients")
     public ModelAndView viewMyClientList(
             @RequestParam(defaultValue = "0") int page,
@@ -145,14 +164,12 @@ public class ClientController {
             @RequestParam(required = false) String city) {
 
         User user = getLoggedInUser();
-        // If the user has full manage permission, just redirect them to the full list
-        boolean canManageAll = user != null &&
-                (user.hasRole("ADMIN") || user.hasRole("SUPERADMIN") || user.hasRole("CLIENT_MANAGE"));
-        if (canManageAll) {
-            return new ModelAndView("redirect:/view_clients_list");
+        if (user == null || !(user.hasRole("ADMIN") || user.hasRole("SUPERADMIN")
+                || user.hasRole("CLIENT_CREATE") || user.hasRole("CLIENT_MANAGE"))) {
+            return new ModelAndView("redirect:/dashboard");
         }
 
-        Long createdBy = (user != null) ? user.getId() : null;
+        Long createdBy = user.getId();
 
         ModelAndView mv = new ModelAndView("admin/client/viewClientListing");
         Page<ClientEntity> paged = clientService.filterClients(clientName, active, city, createdBy,
@@ -214,7 +231,7 @@ public class ClientController {
     // ─── UPDATE CLIENT ───────────────────────────────────────────────────────
     @PostMapping("edit_client")
     public String editClient(@ModelAttribute("CLIENT_OBJ") ClientDTO dto,
-                             RedirectAttributes ra) {
+            RedirectAttributes ra) {
         if (dto.getMobile() != null && !dto.getMobile().trim().isEmpty()
                 && clientService.isMobileExistsForOther(dto.getMobile(), dto.getClientId())) {
             ra.addFlashAttribute("error", "Another client already uses this mobile number.");
@@ -272,7 +289,7 @@ public class ClientController {
 
         // Header Row
         Row headerRow = sheet.createRow(0);
-        String[] columns = {"ID", "Client Name", "Mobile", "Email", "City", "Country", "Source", "Type", "Status"};
+        String[] columns = { "ID", "Client Name", "Mobile", "Email", "City", "Country", "Source", "Type", "Status" };
         for (int i = 0; i < columns.length; i++) {
             Cell cell = headerRow.createCell(i);
             cell.setCellValue(columns[i]);
@@ -341,7 +358,7 @@ public class ClientController {
 
         // Header style
         com.itextpdf.text.Font headerPdfFont = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 10, BaseColor.WHITE);
-        String[] headers = {"ID", "Client Name", "Mobile", "Email", "City", "Country", "Source", "Type", "Status"};
+        String[] headers = { "ID", "Client Name", "Mobile", "Email", "City", "Country", "Source", "Type", "Status" };
         for (String h : headers) {
             PdfPCell headerCell = new PdfPCell(new Phrase(h, headerPdfFont));
             headerCell.setBackgroundColor(new BaseColor(15, 23, 42));
@@ -353,15 +370,21 @@ public class ClientController {
         // Data rows style
         com.itextpdf.text.Font dataFont = FontFactory.getFont(FontFactory.HELVETICA, 9, BaseColor.BLACK);
         for (ClientEntity client : clients) {
-            table.addCell(new PdfPCell(new Phrase(String.valueOf(client.getClientId() != null ? client.getClientId() : 0), dataFont)));
-            table.addCell(new PdfPCell(new Phrase(client.getClientName() != null ? client.getClientName() : "", dataFont)));
+            table.addCell(new PdfPCell(
+                    new Phrase(String.valueOf(client.getClientId() != null ? client.getClientId() : 0), dataFont)));
+            table.addCell(
+                    new PdfPCell(new Phrase(client.getClientName() != null ? client.getClientName() : "", dataFont)));
             table.addCell(new PdfPCell(new Phrase(client.getMobile() != null ? client.getMobile() : "", dataFont)));
             table.addCell(new PdfPCell(new Phrase(client.getEmailId() != null ? client.getEmailId() : "", dataFont)));
-            table.addCell(new PdfPCell(new Phrase(client.getCity() != null ? client.getCity().getName() : "", dataFont)));
+            table.addCell(
+                    new PdfPCell(new Phrase(client.getCity() != null ? client.getCity().getName() : "", dataFont)));
             table.addCell(new PdfPCell(new Phrase(client.getCountry() != null ? client.getCountry() : "", dataFont)));
-            table.addCell(new PdfPCell(new Phrase(client.getClientSource() != null ? client.getClientSource() : "", dataFont)));
-            table.addCell(new PdfPCell(new Phrase(client.getClientType() != null ? client.getClientType() : "", dataFont)));
-            table.addCell(new PdfPCell(new Phrase(Boolean.TRUE.equals(client.getActive()) ? "Active" : "Inactive", dataFont)));
+            table.addCell(new PdfPCell(
+                    new Phrase(client.getClientSource() != null ? client.getClientSource() : "", dataFont)));
+            table.addCell(
+                    new PdfPCell(new Phrase(client.getClientType() != null ? client.getClientType() : "", dataFont)));
+            table.addCell(new PdfPCell(
+                    new Phrase(Boolean.TRUE.equals(client.getActive()) ? "Active" : "Inactive", dataFont)));
         }
 
         document.add(table);
@@ -393,7 +416,8 @@ public class ClientController {
         entity.setRemarks(dto.getRemarks());
         entity.setActive(dto.getActive() != null ? dto.getActive() : Boolean.TRUE);
         if (loggedIn != null) {
-            if (existing == null) entity.setCreatedBy(loggedIn.getId());
+            if (existing == null)
+                entity.setCreatedBy(loggedIn.getId());
             entity.setUpdatedBy(loggedIn.getId());
         }
         return entity;
