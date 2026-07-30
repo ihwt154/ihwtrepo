@@ -69,7 +69,7 @@
                                                 <a href="#" class="gs-nav-link">Lead Management</a>
                                                 <ul class="gs-dropdown">
                                                     <sec:authorize
-                                                        access="hasAnyRole('SUPERADMIN','ADMIN','LEADS_CREATE','LEADS_MANAGE')">
+                                                        access="hasAnyRole('SUPERADMIN','ADMIN','LEADS_CREATE')">
                                                         <li><a href="${pageContext.request.contextPath}/view_add_lead_form"
                                                                 class="gs-dropdown-item">Add New Lead</a></li>
                                                         <li><a href="${pageContext.request.contextPath}/view_my_leads"
@@ -104,7 +104,7 @@
                                                         <a href="#" class="gs-nav-link">Client Management</a>
                                                         <ul class="gs-dropdown">
                                                             <sec:authorize
-                                                                access="hasAnyRole('SUPERADMIN','ADMIN','CLIENT_CREATE','CLIENT_MANAGE')">
+                                                                access="hasAnyRole('SUPERADMIN','ADMIN','CLIENT_CREATE')">
                                                                 <li><a href="${pageContext.request.contextPath}/view_add_client_form"
                                                                         class="gs-dropdown-item">Add Client</a></li>
                                                                 <li><a href="${pageContext.request.contextPath}/view_my_clients"

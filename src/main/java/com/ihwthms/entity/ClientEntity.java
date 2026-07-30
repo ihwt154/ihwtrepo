@@ -15,6 +15,9 @@ public class ClientEntity {
     @Column(name = "clientName", nullable = false)
     private String clientName;
 
+    @Column(name = "client_code", length = 50, unique = true)
+    private String clientCode;
+
     @Column(name = "mobile", length = 50)
     private String mobile;
 
@@ -89,6 +92,9 @@ public class ClientEntity {
 
     public String getClientName() { return clientName; }
     public void setClientName(String clientName) { this.clientName = clientName; }
+
+    public String getClientCode() { return clientCode; }
+    public void setClientCode(String clientCode) { this.clientCode = clientCode; }
 
     public String getMobile() { return mobile; }
     public void setMobile(String mobile) { this.mobile = mobile; }

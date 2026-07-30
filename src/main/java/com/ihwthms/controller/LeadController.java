@@ -74,13 +74,19 @@ public class LeadController {
     // ─── ADD LEAD FORM ───────────────────────────────────────────────────────
     @GetMapping("/view_add_lead_form")
     public ModelAndView viewAddLeadForm() {
+        User loggedIn = getLoggedInUser();
+        boolean hasAccess = loggedIn != null &&
+                (loggedIn.hasRole("ADMIN") || loggedIn.hasRole("SUPERADMIN") || loggedIn.hasRole("LEADS_CREATE"));
+        if (!hasAccess) {
+            return new ModelAndView("redirect:/dashboard");
+        }
         ModelAndView mv = new ModelAndView("leads/createLead");
         mv.addObject("LEAD_OBJ", new LeadDTO());
         mv.addObject("ACTIVE_USERS_MAP", getActiveUsersMap());
         mv.addObject("LEAD_STATUSES", workloadStatusService.getActiveLeadStatuses());
         mv.addObject("PRIORITIES", PRIORITIES);
         mv.addObject("CLIENT_SOURCES", clientSourceService.findAllActive());
-        mv.addObject("CURRENT_USER", getLoggedInUser());
+        mv.addObject("CURRENT_USER", loggedIn);
         return mv;
     }
 
@@ -88,6 +94,13 @@ public class LeadController {
     @PostMapping("/create_lead")
     public String createLead(@ModelAttribute("LEAD_OBJ") LeadDTO dto,
             RedirectAttributes ra) {
+        User loggedIn = getLoggedInUser();
+        if (loggedIn == null || !(loggedIn.hasRole("ADMIN") || loggedIn.hasRole("SUPERADMIN")
+                || loggedIn.hasRole("LEADS_CREATE"))) {
+            ra.addFlashAttribute("error", "You do not have permission to create leads.");
+            return "redirect:/dashboard";
+        }
+
         // Validate client selection
         if (dto.getClientId() == null || dto.getClientId() <= 0) {
             ra.addFlashAttribute("error", "Please select a valid client before creating a lead.");
@@ -95,8 +108,7 @@ public class LeadController {
         }
 
         // Enforce lead assignment for non-privileged users
-        User loggedIn = getLoggedInUser();
-        if (loggedIn != null && !(loggedIn.hasRole("ADMIN") || loggedIn.hasRole("SUPERADMIN"))) {
+        if (!(loggedIn.hasRole("ADMIN") || loggedIn.hasRole("SUPERADMIN"))) {
             dto.setAssignedTo(loggedIn.getId());
         }
 

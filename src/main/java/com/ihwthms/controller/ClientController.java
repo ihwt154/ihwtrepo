@@ -3,24 +3,32 @@ package com.ihwthms.controller;
 import com.ihwthms.entity.ClientEntity;
 import com.ihwthms.entity.User;
 import com.ihwthms.model.ClientDTO;
+import com.ihwthms.model.ImportErrorRow;
+import com.ihwthms.model.ImportResultDTO;
 import com.ihwthms.repository.CityRepository;
 import com.ihwthms.repository.UserRepository;
+import com.ihwthms.service.ClientImportService;
 import com.ihwthms.service.ClientService;
 import com.ihwthms.service.ClientSourceService;
+import com.ihwthms.service.ClientTemplateService;
 import com.ihwthms.service.ClientTypeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.http.MediaType;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -40,6 +48,8 @@ import com.itextpdf.text.pdf.PdfWriter;
 @Controller
 public class ClientController {
 
+    private static final String SESSION_IMPORT_ERRORS = "importErrors";
+
     @Autowired
     private ClientService clientService;
     @Autowired
@@ -50,6 +60,10 @@ public class ClientController {
     private ClientTypeService clientTypeService;
     @Autowired
     private CityRepository cityRepository;
+    @Autowired
+    private ClientImportService clientImportService;
+    @Autowired
+    private ClientTemplateService clientTemplateService;
 
     private static final List<String> CLIENT_STATUSES = Arrays.asList(
             "Active", "Inactive");
@@ -64,8 +78,7 @@ public class ClientController {
     public ModelAndView viewAddClientForm() {
         User loggedIn = getLoggedInUser();
         boolean hasAccess = loggedIn != null &&
-                (loggedIn.hasRole("ADMIN") || loggedIn.hasRole("SUPERADMIN") || loggedIn.hasRole("CLIENT_MANAGE")
-                        || loggedIn.hasRole("CLIENT_CREATE"));
+                (loggedIn.hasRole("ADMIN") || loggedIn.hasRole("SUPERADMIN") || loggedIn.hasRole("CLIENT_CREATE"));
         if (!hasAccess) {
             return new ModelAndView("redirect:/dashboard");
         }
@@ -88,17 +101,17 @@ public class ClientController {
     @PostMapping("create_client")
     public String createClient(@ModelAttribute("CLIENT_OBJ") ClientDTO dto,
             RedirectAttributes ra) {
+        User loggedIn = getLoggedInUser();
+        if (loggedIn == null || !(loggedIn.hasRole("ADMIN") || loggedIn.hasRole("SUPERADMIN")
+                || loggedIn.hasRole("CLIENT_CREATE"))) {
+            ra.addFlashAttribute("error", "You do not have permission to create clients.");
+            return "redirect:/dashboard";
+        }
+
         if (dto.getMobile() != null && !dto.getMobile().trim().isEmpty()
                 && clientService.isMobileExists(dto.getMobile())) {
             ra.addFlashAttribute("error", "A client with this mobile number already exists.");
             return "redirect:view_add_client_form";
-        }
-
-        User loggedIn = getLoggedInUser();
-        if (loggedIn == null || !(loggedIn.hasRole("ADMIN") || loggedIn.hasRole("SUPERADMIN")
-                || loggedIn.hasRole("CLIENT_MANAGE") || loggedIn.hasRole("CLIENT_CREATE"))) {
-            ra.addFlashAttribute("error", "You do not have permission to create clients.");
-            return "redirect:/dashboard";
         }
 
         ClientEntity entity = buildEntityFromDTO(dto, null, loggedIn);
@@ -389,6 +402,75 @@ public class ClientController {
 
         document.add(table);
         document.close();
+    }
+
+    // ── BULK IMPORT: Download Excel Template ─────────────────────────────────
+    @GetMapping("clients/import/template/excel")
+    public void downloadExcelTemplate(HttpServletResponse response) throws IOException {
+        User user = getLoggedInUser();
+        if (user == null || !(user.hasRole("ADMIN") || user.hasRole("SUPERADMIN")
+                || user.hasRole("CLIENT_CREATE"))) {
+            response.sendError(HttpServletResponse.SC_FORBIDDEN);
+            return;
+        }
+        clientTemplateService.writeExcelTemplate(response);
+    }
+
+    // ── BULK IMPORT: Download PDF Quick Reference ─────────────────────────────
+    @GetMapping("clients/import/template/pdf")
+    public void downloadPdfGuide(HttpServletResponse response) throws IOException, DocumentException {
+        User user = getLoggedInUser();
+        if (user == null || !(user.hasRole("ADMIN") || user.hasRole("SUPERADMIN")
+                || user.hasRole("CLIENT_CREATE"))) {
+            response.sendError(HttpServletResponse.SC_FORBIDDEN);
+            return;
+        }
+        clientTemplateService.writePdfGuide(response);
+    }
+
+    // ── BULK IMPORT: Upload & Process Excel ───────────────────────────────────
+    @PostMapping(value = "clients/import/upload", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    public String uploadImportFile(@RequestParam("file") MultipartFile file,
+                                   HttpSession session) {
+        User user = getLoggedInUser();
+        if (user == null || !(user.hasRole("ADMIN") || user.hasRole("SUPERADMIN")
+                || user.hasRole("CLIENT_CREATE"))) {
+            return "{\"error\":\"Access Denied\"}";
+        }
+        if (file == null || file.isEmpty()) {
+            return "{\"error\":\"No file uploaded\"}";
+        }
+        String originalName = file.getOriginalFilename();
+        if (originalName == null || (!originalName.endsWith(".xlsx") && !originalName.endsWith(".xls"))) {
+            return "{\"error\":\"Only .xlsx or .xls files are accepted\"}";
+        }
+        try {
+            ImportResultDTO result = clientImportService.processImport(file, user.getId());
+            // Store errors in session for later download
+            session.setAttribute(SESSION_IMPORT_ERRORS, result.getErrors());
+            return String.format(
+                "{\"total\":%d,\"success\":%d,\"failed\":%d}",
+                result.getTotalProcessed(), result.getSuccessCount(), result.getFailedCount());
+        } catch (Exception ex) {
+            return "{\"error\":\"Import failed: " + ex.getMessage().replace('"', '\'' ) + "\"}";
+        }
+    }
+
+    // ── BULK IMPORT: Download Error Report (.txt) ─────────────────────────────
+    @GetMapping("clients/import/error-report/txt")
+    public void downloadErrorReportTxt(HttpServletResponse response, HttpSession session)
+            throws IOException {
+        User user = getLoggedInUser();
+        if (user == null || !(user.hasRole("ADMIN") || user.hasRole("SUPERADMIN")
+                || user.hasRole("CLIENT_CREATE"))) {
+            response.sendError(HttpServletResponse.SC_FORBIDDEN);
+            return;
+        }
+        @SuppressWarnings("unchecked")
+        List<ImportErrorRow> errors = (List<ImportErrorRow>) session.getAttribute(SESSION_IMPORT_ERRORS);
+        if (errors == null) errors = new ArrayList<>();
+        clientTemplateService.writeErrorReportTxt(response, errors);
     }
 
     // ─── Helper ──────────────────────────────────────────────────────────────

@@ -264,6 +264,91 @@
             font-size: 12px;
             font-weight: 600;
         }
+
+        /* ── Custom UI Error Modal Popup ────────────────────────── */
+        .custom-modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(4px);
+            z-index: 9999;
+            justify-content: center;
+            align-items: center;
+            transition: all 0.3s ease;
+        }
+        .custom-modal-overlay.open {
+            display: flex;
+        }
+        .custom-modal-box {
+            background: #ffffff;
+            border-radius: 16px;
+            padding: 28px 32px;
+            width: 440px;
+            max-width: 92%;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.25);
+            border: 1px solid #e2e8f0;
+            animation: modalPopIn 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            text-align: center;
+        }
+        @keyframes modalPopIn {
+            from { transform: scale(0.85); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+        .custom-modal-icon {
+            font-size: 42px;
+            margin-bottom: 10px;
+            line-height: 1;
+        }
+        .custom-modal-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #0f172a;
+            margin-bottom: 12px;
+        }
+        .custom-modal-body {
+            font-size: 14px;
+            color: #475569;
+            margin-bottom: 24px;
+            text-align: left;
+            background: #f8fafc;
+            border-radius: 10px;
+            padding: 14px 18px;
+            border: 1px solid #f1f5f9;
+        }
+        .custom-modal-body ul {
+            margin: 0;
+            padding-left: 18px;
+        }
+        .custom-modal-body li {
+            margin-bottom: 6px;
+            color: #dc2626;
+            font-weight: 500;
+        }
+        .custom-modal-body li:last-child {
+            margin-bottom: 0;
+        }
+        .custom-modal-actions {
+            display: flex;
+            justify-content: center;
+        }
+        .btn-modal-ok {
+            background: var(--gold-primary);
+            color: #ffffff;
+            border: none;
+            padding: 10px 36px;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background 0.2s ease;
+        }
+        .btn-modal-ok:hover {
+            background: var(--gold-hover);
+        }
     </style>
 </head>
 <body>
@@ -375,7 +460,7 @@
             <div class="user-form-card">
                 <h3 id="form-title" class="form-section-title">Add User</h3>
                 
-                <form action="${pageContext.request.contextPath}/admin/users/save" method="post" id="userForm">
+                <form action="${pageContext.request.contextPath}/admin/users/save" method="post" id="userForm" novalidate>
                     <input type="hidden" name="id" id="form-id" value="">
 
                     <!-- Row 1: Credentials & Type -->
@@ -433,8 +518,8 @@
                             <input type="date" id="form-dob" name="dob" required>
                         </div>
                         <div class="form-field-group">
-                            <label for="form-email">Personal Email</label>
-                            <input type="email" id="form-email" name="email">
+                            <label for="form-email">Personal Email <span class="required-asterisk">*</span></label>
+                            <input type="email" id="form-email" name="email" required>
                         </div>
                         <div class="form-field-group">
                             <label for="form-mobile">Personal Phone <span class="required-asterisk">*</span></label>
@@ -491,6 +576,28 @@
         </div>
 
     </div>
+
+    <!-- ── Custom UI Error Modal Popup ──────────────────────────────── -->
+    <div id="errorModalOverlay" class="custom-modal-overlay">
+        <div class="custom-modal-box">
+            <div class="custom-modal-icon">⚠️</div>
+            <div class="custom-modal-title" id="errorModalTitle">Validation Errors</div>
+            <div class="custom-modal-body" id="errorModalBody">
+                <ul id="errorModalList"></ul>
+            </div>
+            <div class="custom-modal-actions">
+                <button type="button" class="btn-modal-ok" onclick="closeErrorModal()">OK</button>
+            </div>
+        </div>
+    </div>
+
+    <%-- Hidden spans to pass server-side error messages to JS without entity-escaping issues --%>
+    <c:if test="${not empty errorMessage}">
+        <span id="_srv_errorMessage" style="display:none;"><c:out value="${errorMessage}"/></span>
+    </c:if>
+    <c:if test="${not empty error}">
+        <span id="_srv_error" style="display:none;"><c:out value="${error}"/></span>
+    </c:if>
 
     <script>
         /* ── Toggle Views ────────────────────────────────────────── */
@@ -642,18 +749,86 @@
             showFormView('Update User');
         }
 
+        /* ── Custom UI Error Modal Helpers ────────────────────────── */
+        function showErrorModal(errorList) {
+            const listEl = document.getElementById('errorModalList');
+            listEl.innerHTML = '';
+            errorList.forEach(function(err) {
+                const li = document.createElement('li');
+                li.textContent = err;
+                listEl.appendChild(li);
+            });
+            document.getElementById('errorModalOverlay').classList.add('open');
+        }
+
+        function closeErrorModal() {
+            document.getElementById('errorModalOverlay').classList.remove('open');
+        }
+
+        document.getElementById('errorModalOverlay').addEventListener('click', function(e) {
+            if (e.target === this) closeErrorModal();
+        });
+
         /* ── Submit Validation ─────────────────────────────────── */
         document.getElementById('userForm').addEventListener('submit', function(e) {
+            const errors = [];
+            const username = document.getElementById('form-username').value.trim();
             const password = document.getElementById('form-password').value;
             const confirm = document.getElementById('form-password-confirm').value;
             const id = document.getElementById('form-id').value;
-            
-            if (password || !id) {
-                if (password !== confirm) {
-                    e.preventDefault();
-                    alert('Passwords do not match.');
-                }
+            const fullName = document.getElementById('form-fullName').value.trim();
+            const companyEmail = document.getElementById('form-companyEmail').value.trim();
+            const companyMobile = document.getElementById('form-companyMobile').value.trim();
+            const dob = document.getElementById('form-dob').value;
+            const email = document.getElementById('form-email').value.trim();
+            const mobile = document.getElementById('form-mobile').value.trim();
+            const address = document.getElementById('form-address').value.trim();
+            const doj = document.getElementById('form-doj').value;
+
+            if (!username) errors.push('User Name is required.');
+            if (!id && !password) {
+                errors.push('Password is required.');
             }
+            if ((password || !id) && password !== confirm) {
+                errors.push('Passwords do not match.');
+            }
+            if (!fullName) errors.push('User Full Name is required.');
+            if (!companyEmail) {
+                errors.push('Company Email is required.');
+            } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(companyEmail)) {
+                errors.push('Please enter a valid Company Email address.');
+            }
+            if (!companyMobile) errors.push('Company Mobile is required.');
+            if (!dob) errors.push('Date of Birth is required.');
+            if (!email) {
+                errors.push('Personal Email is required.');
+            } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+                errors.push('Please enter a valid Personal Email address.');
+            }
+            if (!mobile) errors.push('Personal Phone is required.');
+            if (!address) errors.push('Address is required.');
+            if (!doj) errors.push('Date Of Joining is required.');
+
+            if (errors.length > 0) {
+                e.preventDefault();
+                showErrorModal(errors);
+            }
+        });
+
+        // Trigger custom error modal on page load if server returned validation/database error
+        document.addEventListener('DOMContentLoaded', function() {
+            <c:if test="${not empty errorMessage}">
+                (function(){
+                    var el = document.getElementById('_srv_errorMessage');
+                    if (el && el.textContent.trim()) showErrorModal([el.textContent.trim()]);
+                })();
+            </c:if>
+            <c:if test="${not empty error}">
+                (function(){
+                    var el = document.getElementById('_srv_error');
+                    if (el && el.textContent.trim()) showErrorModal([el.textContent.trim()]);
+                })();
+            </c:if>
         });
     </script>
 </body>

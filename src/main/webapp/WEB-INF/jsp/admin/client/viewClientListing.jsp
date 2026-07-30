@@ -49,8 +49,13 @@
                 <c:otherwise>Manage Clients</c:otherwise>
             </c:choose>
         </h2>
-        <a href="${pageContext.request.contextPath}/view_add_client_form"
-           style="padding:10px 20px;background:var(--accent-primary);color:#fff;border-radius:8px;text-decoration:none;font-weight:600;">+ Add Client</a>
+        <div style="display:flex;gap:10px;align-items:center;">
+            <button onclick="document.getElementById('bulkImportModal').classList.add('open')"
+               style="padding:10px 18px;background:linear-gradient(135deg,#7c3aed,#4f46e5);color:#fff;border:none;border-radius:8px;cursor:pointer;font-weight:600;font-size:0.9rem;display:flex;align-items:center;gap:6px;"
+               id="btnOpenBulkImport">&#8679; Bulk Import</button>
+            <a href="${pageContext.request.contextPath}/view_add_client_form"
+               style="padding:10px 20px;background:var(--accent-primary);color:#fff;border-radius:8px;text-decoration:none;font-weight:600;">+ Add Client</a>
+        </div>
     </div>
 
     <c:if test="${not empty success}"><div style="background:#d1fae5;color:#065f46;padding:12px;border-radius:8px;margin-bottom:16px;">${success}</div></c:if>
@@ -111,6 +116,8 @@
                style="padding:6px 12px;background:#10b981;color:#fff;border-radius:6px;text-decoration:none;font-size:0.8rem;font-weight:600;">Export Excel</a>
             <a href="${pageContext.request.contextPath}/clients/export/pdf?clientName=${f_clientName}&city=${f_city}&active=${f_active}"
                style="padding:6px 12px;background:#ef4444;color:#fff;border-radius:6px;text-decoration:none;font-size:0.8rem;font-weight:600;">Export PDF</a>
+            <button onclick="document.getElementById('bulkImportModal').classList.add('open')"
+               style="padding:6px 12px;background:linear-gradient(135deg,#7c3aed,#4f46e5);color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:0.8rem;font-weight:600;">&#8679; Bulk Import</button>
         </div>
     </div>
 
@@ -198,6 +205,116 @@
     </div>
 </div>
 
+<%-- ═══════════════════════════════════════════════════════
+     BULK CLIENT IMPORT MODAL
+══════════════════════════════════════════════════════════ --%>
+<div id="bulkImportModal" class="confirm-overlay" style="z-index:3000;">
+  <div style="background:#fff;border-radius:20px;padding:0;width:540px;max-width:96%;box-shadow:0 30px 80px rgba(0,0,0,0.25);animation:popIn .22s ease;overflow:hidden;">
+
+    <%-- Modal Header --%>
+    <div style="background:linear-gradient(135deg,#4f46e5,#7c3aed);padding:22px 28px;display:flex;justify-content:space-between;align-items:center;">
+      <div>
+        <h3 style="color:#fff;margin:0;font-size:1.15rem;font-weight:700;">&#8679; Bulk Import Clients</h3>
+        <p style="color:rgba(255,255,255,0.75);margin:4px 0 0;font-size:0.8rem;">Upload an Excel file to create multiple client records at once</p>
+      </div>
+      <button onclick="closeBulkImportModal()" style="background:rgba(255,255,255,0.2);border:none;color:#fff;border-radius:50%;width:32px;height:32px;font-size:1.1rem;cursor:pointer;display:flex;align-items:center;justify-content:center;">&times;</button>
+    </div>
+
+    <%-- Modal Body --%>
+    <div style="padding:24px 28px;">
+
+      <%-- Download template row --%>
+      <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;padding:14px 18px;margin-bottom:18px;">
+        <p style="font-size:0.82rem;font-weight:700;color:#475569;margin:0 0 10px;">&#x1F4E5; Download Template</p>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;">
+          <a href="${pageContext.request.contextPath}/clients/import/template/excel"
+             style="padding:8px 16px;background:#059669;color:#fff;border-radius:8px;text-decoration:none;font-size:0.83rem;font-weight:600;display:flex;align-items:center;gap:6px;">
+            &#x1F4C8; Excel Template
+          </a>
+        </div>
+      </div>
+
+      <%-- Upload area --%>
+      <div style="margin-bottom:16px;">
+        <label style="font-size:0.82rem;font-weight:700;color:#374151;display:block;margin-bottom:8px;">&#x1F4C2; Select Excel File (.xlsx / .xls)</label>
+        <div id="importDropZone"
+             ondragover="event.preventDefault();this.style.borderColor='#7c3aed';"
+             ondragleave="this.style.borderColor='#c4b5fd';"
+             ondrop="handleImportDrop(event)"
+             style="border:2px dashed #c4b5fd;border-radius:12px;padding:28px;text-align:center;background:#faf5ff;cursor:pointer;transition:.2s;"
+             onclick="document.getElementById('importFileInput').click()">
+          <div style="font-size:2rem;margin-bottom:6px;">&#x1F4C4;</div>
+          <p style="font-size:0.85rem;color:#6d28d9;font-weight:600;margin:0 0 4px;">Click to browse or drag & drop</p>
+          <p id="importFileName" style="font-size:0.78rem;color:#9ca3af;margin:0;">No file selected</p>
+        </div>
+        <input type="file" id="importFileInput" accept=".xlsx,.xls" style="display:none;"
+               onchange="handleImportFileChange(this)">
+      </div>
+
+      <%-- Rules reminder --%>
+      <p style="font-size:0.75rem;color:#64748b;margin:0 0 16px;line-height:1.6;">
+        <span style="color:#7c3aed;font-weight:700;">&#9432; Note:</span>
+        Client Name + Mobile or Email required &nbsp;|&nbsp; Mobile = 10 digits &nbsp;|&nbsp;
+        Duplicate Mobile/Email will be skipped &nbsp;|&nbsp; Client Code auto-generated.
+      </p>
+
+      <%-- Upload button + progress --%>
+      <div style="display:flex;gap:10px;align-items:center;">
+        <button id="btnUploadImport" onclick="submitImportFile()"
+                style="padding:10px 24px;background:linear-gradient(135deg,#7c3aed,#4f46e5);color:#fff;border:none;border-radius:8px;cursor:pointer;font-weight:700;font-size:0.9rem;">
+          &#8679; Upload &amp; Import
+        </button>
+        <button onclick="closeBulkImportModal()"
+                style="padding:10px 18px;background:#f1f5f9;color:#475569;border:1px solid #e2e8f0;border-radius:8px;cursor:pointer;font-weight:600;font-size:0.9rem;">
+          Cancel
+        </button>
+      </div>
+
+      <%-- Progress bar (hidden initially) --%>
+      <div id="importProgressWrap" style="display:none;margin-top:14px;">
+        <div style="height:6px;background:#e2e8f0;border-radius:99px;overflow:hidden;">
+          <div id="importProgressBar" style="height:100%;width:0;background:linear-gradient(90deg,#7c3aed,#4f46e5);border-radius:99px;transition:width .4s ease;"></div>
+        </div>
+        <p id="importProgressText" style="font-size:0.8rem;color:#6d28d9;margin:6px 0 0;text-align:center;">Processing...</p>
+      </div>
+
+      <%-- Result Summary (hidden initially) --%>
+      <div id="importSummary" style="display:none;margin-top:18px;border-top:1px solid #f1f5f9;padding-top:16px;">
+        <p style="font-size:0.85rem;font-weight:700;color:#1e293b;margin:0 0 12px;">&#x2705; Import Complete — Summary</p>
+        <div style="display:flex;gap:12px;margin-bottom:14px;">
+          <div style="flex:1;background:#f8fafc;border-radius:10px;padding:12px;text-align:center;border:1px solid #e2e8f0;">
+            <div id="sumTotal" style="font-size:1.6rem;font-weight:800;color:#1e293b;">0</div>
+            <div style="font-size:0.73rem;color:#64748b;font-weight:600;margin-top:2px;">TOTAL ROWS</div>
+          </div>
+          <div style="flex:1;background:#d1fae5;border-radius:10px;padding:12px;text-align:center;border:1px solid #a7f3d0;">
+            <div id="sumSuccess" style="font-size:1.6rem;font-weight:800;color:#065f46;">0</div>
+            <div style="font-size:0.73rem;color:#047857;font-weight:600;margin-top:2px;">IMPORTED</div>
+          </div>
+          <div style="flex:1;background:#fee2e2;border-radius:10px;padding:12px;text-align:center;border:1px solid #fca5a5;">
+            <div id="sumFailed" style="font-size:1.6rem;font-weight:800;color:#991b1b;">0</div>
+            <div style="font-size:0.73rem;color:#b91c1c;font-weight:600;margin-top:2px;">FAILED</div>
+          </div>
+        </div>
+
+        <%-- Error download button (shown only if failures exist) --%>
+        <div id="importErrorBtns" style="display:none;margin-top:12px;">
+          <p style="font-size:0.8rem;color:#64748b;margin:0 0 8px;">Download failed records report:</p>
+          <div>
+            <a href="${pageContext.request.contextPath}/clients/import/error-report/txt"
+               style="padding:8px 16px;background:#dc2626;color:#fff;border-radius:8px;text-decoration:none;font-size:0.8rem;font-weight:600;display:inline-block;">&#x1F4C4; Download Error Report (.txt)</a>
+          </div>
+        </div>
+
+        <button onclick="window.location.reload()"
+                style="margin-top:14px;padding:9px 20px;background:#4f46e5;color:#fff;border:none;border-radius:8px;cursor:pointer;font-weight:600;font-size:0.85rem;">
+          Refresh Client List
+        </button>
+      </div>
+
+    </div><%-- end modal body --%>
+  </div>
+</div>
+
 <script>
 var _pendingFormId = null;
 
@@ -258,6 +375,127 @@ document.addEventListener('click', function(e) {
         document.querySelectorAll('.searchable-select-options-panel').forEach(function(p) { p.style.display = 'none'; });
     }
 });
+
+/* ── Bulk Import JS ─────────────────────────────────────────────────── */
+var importFileObj = null;
+
+function closeBulkImportModal() {
+  document.getElementById('bulkImportModal').classList.remove('open');
+  resetImportModal();
+}
+
+function resetImportModal() {
+  importFileObj = null;
+  document.getElementById('importFileName').textContent = 'No file selected';
+  document.getElementById('importFileInput').value = '';
+  document.getElementById('importDropZone').style.borderColor = '#c4b5fd';
+  document.getElementById('importProgressWrap').style.display = 'none';
+  document.getElementById('importProgressBar').style.width = '0';
+  document.getElementById('importSummary').style.display = 'none';
+  document.getElementById('importErrorBtns').style.display = 'none';
+  document.getElementById('btnUploadImport').disabled = false;
+}
+
+function handleImportFileChange(input) {
+  if (input.files && input.files[0]) {
+    importFileObj = input.files[0];
+    document.getElementById('importFileName').textContent = importFileObj.name;
+    document.getElementById('importDropZone').style.borderColor = '#7c3aed';
+  }
+}
+
+function handleImportDrop(event) {
+  event.preventDefault();
+  var files = event.dataTransfer.files;
+  if (files && files[0]) {
+    importFileObj = files[0];
+    document.getElementById('importFileName').textContent = importFileObj.name;
+    document.getElementById('importDropZone').style.borderColor = '#7c3aed';
+  }
+}
+
+function submitImportFile() {
+  if (!importFileObj) {
+    showImportError('Please select a file before uploading.');
+    return;
+  }
+  var name = importFileObj.name;
+  if (!name.endsWith('.xlsx') && !name.endsWith('.xls')) {
+    showImportError('Only .xlsx or .xls files are accepted.');
+    return;
+  }
+
+  // Show progress
+  document.getElementById('importProgressWrap').style.display = 'block';
+  document.getElementById('importSummary').style.display = 'none';
+  document.getElementById('btnUploadImport').disabled = true;
+  animateProgress();
+
+  var formData = new FormData();
+  formData.append('file', importFileObj);
+
+  fetch('${pageContext.request.contextPath}/clients/import/upload', {
+    method: 'POST',
+    body: formData,
+    headers: { 'X-Requested-With': 'XMLHttpRequest' }
+  })
+  .then(function(r) { return r.json(); })
+  .then(function(data) {
+    clearInterval(window._importTimerId);
+    document.getElementById('importProgressBar').style.width = '100%';
+    document.getElementById('importProgressText').textContent = 'Done!';
+
+    if (data.error) {
+      setTimeout(function() {
+        document.getElementById('importProgressWrap').style.display = 'none';
+        showImportError(data.error);
+        document.getElementById('btnUploadImport').disabled = false;
+      }, 400);
+      return;
+    }
+
+    setTimeout(function() {
+      document.getElementById('importProgressWrap').style.display = 'none';
+      document.getElementById('sumTotal').textContent   = data.total   || 0;
+      document.getElementById('sumSuccess').textContent = data.success || 0;
+      document.getElementById('sumFailed').textContent  = data.failed  || 0;
+      document.getElementById('importSummary').style.display = 'block';
+      if (data.failed && data.failed > 0) {
+        document.getElementById('importErrorBtns').style.display = 'block';
+      }
+    }, 500);
+  })
+  .catch(function(err) {
+    clearInterval(window._importTimerId);
+    document.getElementById('importProgressWrap').style.display = 'none';
+    document.getElementById('btnUploadImport').disabled = false;
+    showImportError('Network error. Please try again.');
+  });
+}
+
+function animateProgress() {
+  var bar = document.getElementById('importProgressBar');
+  var pct = 5;
+  window._importTimerId = setInterval(function() {
+    pct = Math.min(pct + (Math.random() * 8), 90);
+    bar.style.width = pct + '%';
+  }, 300);
+}
+
+function showImportError(msg) {
+  // Reuse existing confirm-overlay pattern
+  var el = document.createElement('div');
+  el.style.cssText = 'position:fixed;inset:0;background:rgba(15,23,42,.55);backdrop-filter:blur(3px);z-index:9999;display:flex;justify-content:center;align-items:center;';
+  el.innerHTML = '<div style="background:#fff;border-radius:16px;padding:32px 28px;width:360px;max-width:92%;box-shadow:0 20px 60px rgba(0,0,0,.2);text-align:center;">'
+    + '<div style="font-size:2.2rem;margin-bottom:10px;">&#9888;&#65039;</div>'
+    + '<div style="font-size:1rem;font-weight:700;color:#1e293b;margin-bottom:8px;">Import Error</div>'
+    + '<div style="font-size:0.88rem;color:#64748b;margin-bottom:20px;line-height:1.5;">' + msg + '</div>'
+    + '<button onclick="this.closest(\'.fixed\') && this.parentElement.parentElement.remove()" style="padding:9px 24px;background:#4f46e5;color:#fff;border:none;border-radius:8px;cursor:pointer;font-weight:600;">OK</button>'
+    + '</div>';
+  el.onclick = function(e) { if(e.target===el) el.remove(); };
+  el.querySelector('button').onclick = function() { el.remove(); };
+  document.body.appendChild(el);
+}
 </script>
 </body>
 </html>

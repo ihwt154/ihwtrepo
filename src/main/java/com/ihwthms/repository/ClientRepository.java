@@ -14,4 +14,9 @@ public interface ClientRepository extends JpaRepository<ClientEntity, Long>, Jpa
     List<ClientEntity> findByClientNameContainingIgnoreCase(String clientName);
     boolean existsByMobile(String mobile);
     boolean existsByMobileAndClientIdNot(String mobile, Long clientId);
+    boolean existsByEmailId(String emailId);
+    boolean existsByEmailIdAndClientIdNot(String emailId, Long clientId);
+
+    @org.springframework.data.jpa.repository.Query("SELECT MAX(c.clientCode) FROM ClientEntity c WHERE c.clientCode LIKE 'CLI-%'")
+    String findMaxClientCode();
 }

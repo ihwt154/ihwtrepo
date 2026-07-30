@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.security.Principal;
 import java.time.LocalDateTime;
@@ -39,7 +40,8 @@ public class UserController {
             @ModelAttribute User user,
             @RequestParam("fullName") String fullName,
             @RequestParam(value = "userType", required = false) String userType,
-            Principal principal) {
+            Principal principal,
+            RedirectAttributes redirectAttributes) {
         if (principal == null) {
             return "redirect:/login";
         }
@@ -61,10 +63,19 @@ public class UserController {
         // Synchronize personalEmail with email (login email)
         user.setPersonalEmail(user.getEmail());
 
+        // Validate duplicate email only (duplicate usernames are permitted)
         if (user.getId() == null) {
+            if (user.getEmail() != null && userRepository.existsByEmail(user.getEmail())) {
+                redirectAttributes.addFlashAttribute("errorMessage", "Email address '" + user.getEmail() + "' is already registered to another user.");
+                return "redirect:/admin/users";
+            }
             user.setCreatedAt(LocalDateTime.now());
             assignRoleByType(user, userType);
         } else {
+            if (user.getEmail() != null && userRepository.existsByEmailAndIdNot(user.getEmail(), user.getId())) {
+                redirectAttributes.addFlashAttribute("errorMessage", "Email address '" + user.getEmail() + "' is already registered to another user.");
+                return "redirect:/admin/users";
+            }
             Optional<User> existing = userRepository.findById(user.getId());
             if (existing.isPresent()) {
                 User ext = existing.get();
@@ -83,15 +94,28 @@ public class UserController {
                 assignRoleByType(user, userType);
             }
         }
+
         user.setUpdatedAt(LocalDateTime.now());
-        userRepository.save(user);
+        try {
+            userRepository.save(user);
+            redirectAttributes.addFlashAttribute("successMessage", "User saved successfully.");
+        } catch (Exception ex) {
+            String msg = ex.getMessage();
+            if (msg != null && msg.toLowerCase().contains("duplicate")) {
+                msg = "A record with this Username or Email already exists.";
+            } else {
+                msg = "Failed to save user: " + (msg != null ? msg : "Unknown database error");
+            }
+            redirectAttributes.addFlashAttribute("errorMessage", msg);
+        }
         return "redirect:/admin/users";
     }
 
     @PostMapping("/toggle")
     public String toggleUserStatus(
             @RequestParam Long id,
-            Principal principal) {
+            Principal principal,
+            RedirectAttributes redirectAttributes) {
         if (principal == null) {
             return "redirect:/login";
         }
@@ -102,7 +126,14 @@ public class UserController {
             if (!user.getUsername().equals(principal.getName())) {
                 user.setActive(!user.isActive());
                 user.setUpdatedAt(LocalDateTime.now());
-                userRepository.save(user);
+                try {
+                    userRepository.save(user);
+                    redirectAttributes.addFlashAttribute("successMessage", "User status updated.");
+                } catch (Exception ex) {
+                    redirectAttributes.addFlashAttribute("errorMessage", "Unable to update status: " + ex.getMessage());
+                }
+            } else {
+                redirectAttributes.addFlashAttribute("errorMessage", "You cannot deactivate your own logged-in account.");
             }
         }
         return "redirect:/admin/users";
