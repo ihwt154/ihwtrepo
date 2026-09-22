@@ -1119,38 +1119,8 @@ java.sql.SQLIntegrityConstraintViolationException: Duplicate entry 'janvi' for k
 2026-09-22 16:46:27.660  INFO 18612 --- [http-nio-8083-exec-2] o.a.c.c.C.[Tomcat].[localhost].[/ihwt]   : Initializing Spring DispatcherServlet 'dispatcherServlet'
 2026-09-22 16:46:27.660  INFO 18612 --- [http-nio-8083-exec-2] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
 2026-09-22 16:46:27.676  INFO 18612 --- [http-nio-8083-exec-2] o.s.web.servlet.DispatcherServlet        : Completed initialization in 16 ms
-2026-09-22 17:11:18.286  INFO 38622 --- [main] com.ihwthms.base.BaseApplication         : Starting BaseApplication on Sushils-MacBook-Air.local with PID 38622 (/Users/sushil/01_Projects/03_IHWT/ihwtrepo/target/classes started by sushil in /Users/sushil/01_Projects/03_IHWT/ihwtrepo)
-2026-09-22 17:11:18.287 DEBUG 38622 --- [main] com.ihwthms.base.BaseApplication         : Running with Spring Boot v2.2.1.RELEASE, Spring v5.2.1.RELEASE
-2026-09-22 17:11:18.287  INFO 38622 --- [main] com.ihwthms.base.BaseApplication         : No active profile set, falling back to default profiles: default
-2026-09-22 17:11:18.352  WARN 38622 --- [background-preinit] o.s.h.c.j.Jackson2ObjectMapperBuilder    : For Jackson Kotlin classes support please add "com.fasterxml.jackson.module:jackson-module-kotlin" to the classpath
-2026-09-22 17:11:18.461  INFO 38622 --- [main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data repositories in DEFAULT mode.
-2026-09-22 17:11:18.486  INFO 38622 --- [main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 22ms. Found 10 repository interfaces.
-2026-09-22 17:11:18.648  INFO 38622 --- [main] trationDelegate$BeanPostProcessorChecker : Bean 'org.springframework.transaction.annotation.ProxyTransactionManagementConfiguration' of type [org.springframework.transaction.annotation.ProxyTransactionManagementConfiguration] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
-2026-09-22 17:11:18.742  INFO 38622 --- [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port(s): 8083 (http)
-2026-09-22 17:11:18.745  INFO 38622 --- [main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
-2026-09-22 17:11:18.746  INFO 38622 --- [main] org.apache.catalina.core.StandardEngine  : Starting Servlet engine: [Apache Tomcat/9.0.27]
-2026-09-22 17:11:18.836  INFO 38622 --- [main] org.apache.jasper.servlet.TldScanner     : At least one JAR was scanned for TLDs yet contained no TLDs. Enable debug logging for this logger for a complete list of JARs that were scanned but no TLDs were found in them. Skipping unneeded JARs during scanning can improve startup time and JSP compilation time.
-2026-09-22 17:11:18.838  INFO 38622 --- [main] o.a.c.c.C.[Tomcat].[localhost].[/ihwt]   : Initializing Spring embedded WebApplicationContext
-2026-09-22 17:11:18.838  INFO 38622 --- [main] o.s.web.context.ContextLoader            : Root WebApplicationContext: initialization completed in 531 ms
-2026-09-22 17:11:18.893  INFO 38622 --- [main] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
-2026-09-22 17:11:18.919  INFO 38622 --- [main] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 5.4.12.Final
-2026-09-22 17:11:18.974  INFO 38622 --- [main] o.hibernate.annotations.common.Version   : HCANN000001: Hibernate Commons Annotations {5.1.0.Final}
-2026-09-22 17:11:19.016  INFO 38622 --- [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
-2026-09-22 17:11:19.063  INFO 38622 --- [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
-2026-09-22 17:11:19.070  INFO 38622 --- [main] org.hibernate.dialect.Dialect            : HHH000400: Using dialect: org.hibernate.dialect.MySQL8Dialect
-2026-09-22 17:11:19.410  INFO 38622 --- [main] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000490: Using JtaPlatform implementation: [org.hibernate.engine.transaction.jta.platform.internal.NoJtaPlatform]
-2026-09-22 17:11:19.413  INFO 38622 --- [main] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
-2026-09-22 17:11:19.548  WARN 38622 --- [main] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
-2026-09-22 17:11:19.717  INFO 38622 --- [main] o.s.s.web.DefaultSecurityFilterChain     : Creating filter chain: any request, [org.springframework.security.web.context.request.async.WebAsyncManagerIntegrationFilter@6d2f910b, org.springframework.security.web.context.SecurityContextPersistenceFilter@1016b44e, org.springframework.security.web.header.HeaderWriterFilter@55cf5626, org.springframework.security.web.authentication.logout.LogoutFilter@4f571c0e, org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter@432b883, org.springframework.security.web.savedrequest.RequestCacheAwareFilter@38e88e13, org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter@439d649c, org.springframework.security.web.authentication.AnonymousAuthenticationFilter@f451970, org.springframework.security.web.session.SessionManagementFilter@7b55f0a6, org.springframework.security.web.access.ExceptionTranslationFilter@1d6dc2b8, org.springframework.security.web.access.intercept.FilterSecurityInterceptor@126e2710]
-2026-09-22 17:11:19.759  INFO 38622 --- [main] o.s.s.concurrent.ThreadPoolTaskExecutor  : Initializing ExecutorService 'applicationTaskExecutor'
-2026-09-22 17:11:19.844  INFO 38622 --- [main] o.s.s.c.ThreadPoolTaskScheduler          : Initializing ExecutorService 'taskScheduler'
-2026-09-22 17:11:19.865  INFO 38622 --- [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port(s): 8083 (http) with context path '/ihwt'
-2026-09-22 17:11:19.866  INFO 38622 --- [main] com.ihwthms.base.BaseApplication         : Started BaseApplication in 1.755 seconds (JVM running for 1.952)
-2026-09-22 17:11:44.604  INFO 38622 --- [http-nio-8083-exec-1] o.a.c.c.C.[Tomcat].[localhost].[/ihwt]   : Initializing Spring DispatcherServlet 'dispatcherServlet'
-2026-09-22 17:11:44.604  INFO 38622 --- [http-nio-8083-exec-1] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
-2026-09-22 17:11:44.607  INFO 38622 --- [http-nio-8083-exec-1] o.s.web.servlet.DispatcherServlet        : Completed initialization in 3 ms
-2026-09-22 17:12:11.644  INFO 38622 --- [SpringContextShutdownHook] o.s.s.c.ThreadPoolTaskScheduler          : Shutting down ExecutorService 'taskScheduler'
-2026-09-22 17:12:11.644  INFO 38622 --- [SpringContextShutdownHook] o.s.s.concurrent.ThreadPoolTaskExecutor  : Shutting down ExecutorService 'applicationTaskExecutor'
-2026-09-22 17:12:11.646  INFO 38622 --- [SpringContextShutdownHook] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
-2026-09-22 17:12:11.646  INFO 38622 --- [SpringContextShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
-2026-09-22 17:12:11.648  INFO 38622 --- [SpringContextShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.
+2026-09-22 16:57:37.867  INFO 18612 --- [SpringContextShutdownHook] o.s.s.c.ThreadPoolTaskScheduler          : Shutting down ExecutorService 'taskScheduler'
+2026-09-22 16:57:37.868  INFO 18612 --- [SpringContextShutdownHook] o.s.s.concurrent.ThreadPoolTaskExecutor  : Shutting down ExecutorService 'applicationTaskExecutor'
+2026-09-22 16:57:37.869  INFO 18612 --- [SpringContextShutdownHook] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2026-09-22 16:57:37.870  INFO 18612 --- [SpringContextShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
+2026-09-22 16:57:37.876  INFO 18612 --- [SpringContextShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.
